@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Futora | AI Intelligence Dashboard</title>
+  <meta name="description"
+    content="Enterprise football intelligence dashboard powered by AI — match predictions, player analytics, and real-time insights for the 2026 FIFA World Cup." />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Eb+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@200..800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#c2652a",
+            "primary-container": "#e08850",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#fbe8d8",
+            "secondary": "#78706a",
+            "secondary-container": "#eae2da",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#605850",
+            "tertiary": "#8c3c3c",
+            "tertiary-container": "#d47070",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#3a2020",
+            "background": "#faf5ee",
+            "on-background": "#3a302a",
+            "surface": "#faf5ee",
+            "surface-dim": "#dcd6cc",
+            "surface-bright": "#faf5ee",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f6f0e8",
+            "surface-container": "#f2ece4",
+            "surface-container-high": "#ece6dc",
+            "surface-container-highest": "#e6e0d6",
+            "surface-variant": "#ece6dc",
+            "on-surface": "#3a302a",
+            "on-surface-variant": "#605850",
+            "outline": "#9a9088",
+            "outline-variant": "#d8d0c8",
+            "error": "#c0392b",
+            "on-error": "#ffffff",
+            "error-container": "#fce4e0",
+            "on-error-container": "#7a1a10",
+            "inverse-surface": "#3a302a",
+            "inverse-on-surface": "#faf5ee",
+            "inverse-primary": "#f0a878",
+            "primary-fixed": "#fbe8d8",
+            "primary-fixed-dim": "#f0a878",
+            "secondary-fixed": "#eae2da",
+            "secondary-fixed-dim": "#cec6be",
+            "tertiary-fixed": "#fce0e0",
+            "tertiary-fixed-dim": "#e8a0a0",
+            "surface-tint": "#c2652a",
+            "sidebar-dark": "#2c2219",
+            "sidebar-hover": "#3d3126",
+          },
+          fontFamily: {
+            headline: ["Eb Garamond"],
+            display: ["Eb Garamond"],
+            body: ["Manrope"],
+            label: ["Manrope"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            "2xl": "1rem",
+            "3xl": "1.5rem",
+            full: "9999px",
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #d8d0c8;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9a9088;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: linear-gradient(180deg, #2c2219 0%, #1a140e 100%);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-item {
+      transition: all 0.2s ease;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-item.active {
+      background: rgba(194, 101, 42, 0.2);
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 24px;
+      background: #c2652a;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* Cards */
+    .stat-card {
+      background: white;
+      border: 1px solid rgba(216, 208, 200, 0.5);
+      border-radius: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(58, 48, 42, 0.08);
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(194, 101, 42, 0.3);
+      }
+
+      50% {
+        box-shadow: 0 0 0 8px rgba(194, 101, 42, 0);
+      }
+    }
+
+    @keyframes progressFill {
+      from {
+        width: 0%;
+      }
+
+      to {
+        width: var(--target-width);
+      }
+    }
+
+    @keyframes countUp {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes livePulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    @keyframes chatBounce {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    .animate-fade-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      opacity: 0;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .animate-slide-left {
+      animation: slideInLeft 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .delay-1 {
+      animation-delay: 0.1s;
+    }
+
+    .delay-2 {
+      animation-delay: 0.2s;
+    }
+
+    .delay-3 {
+      animation-delay: 0.3s;
+    }
+
+    .delay-4 {
+      animation-delay: 0.4s;
+    }
+
+    .delay-5 {
+      animation-delay: 0.5s;
+    }
+
+    .delay-6 {
+      animation-delay: 0.6s;
+    }
+
+    /* Progress bars */
+    .progress-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: #ece6dc;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      animation: progressFill 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Live indicator */
+    .live-dot {
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+
+    /* Match card */
+    .match-card {
+      background: white;
+      border: 1px solid rgba(216, 208, 200, 0.4);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .match-card:hover {
+      border-color: #c2652a;
+      box-shadow: 0 4px 20px rgba(194, 101, 42, 0.1);
+    }
+
+    /* Chat widget */
+    .chat-fab {
+      animation: chatBounce 2s ease-in-out infinite;
+      animation-delay: 3s;
+    }
+
+    .chat-window {
+      transform-origin: bottom right;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chat-window.hidden {
+      transform: scale(0.9);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .chat-window.visible {
+      transform: scale(1);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .chat-msg {
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    /* Tooltip */
+    .tooltip-wrapper {
+      position: relative;
+    }
+
+    .tooltip-wrapper .tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      background: #2c2219;
+      color: white;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      z-index: 100;
+    }
+
+    .tooltip-wrapper:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Heatmap cell */
+    .heat-cell {
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .heat-cell:hover {
+      transform: scale(1.2);
+      z-index: 10;
+    }
+
+    /* Tab styles */
+    .tab-btn {
+      transition: all 0.2s ease;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 8px;
+    }
+
+    .tab-btn.active {
+      color: #c2652a;
+      border-bottom-color: #c2652a;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: #3a302a;
+    }
+
+    /* Mobile sidebar overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 40;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        z-index: 50;
+        height: 100vh;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.mobile-open {
+        left: 0;
+      }
+    }
+
+    /* Dark Mode Overrides */
+    html.dark body {
+      background: #1a1410;
+      color: #e6e0d6;
+    }
+
+    html.dark .stat-card {
+      background: #2c2219;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    html.dark .stat-card:hover {
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    html.dark .match-card {
+      background: #2c2219;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    html.dark .glass-panel {
+      background: rgba(44, 34, 25, 0.9);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    html.dark .progress-bar {
+      background: #3d3126;
+    }
+
+    html.dark input,
+    html.dark select {
+      background: #3d3126;
+      color: #e6e0d6;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    html.dark .chat-window .bg-surface-container-low {
+      background: #3d3126;
+    }
+
+    html.dark .text-on-background,
+    html.dark .text-on-surface {
+      color: #e6e0d6;
+    }
+
+    html.dark .text-on-surface-variant {
+      color: #a89888;
+    }
+
+    html.dark .bg-surface-container-low {
+      background: #3d3126;
+    }
+
+    html.dark .bg-surface-container-high {
+      background: #4a3c31;
+    }
+
+    html.dark .border-outline-variant\/50 {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    html.dark .bg-white {
+      background: #2c2219;
+    }
+
+    html.dark .bg-background {
+      background: #1a1410;
+    }
+  </style>
+</head>
+
+<body class="bg-background font-body text-on-background">
+  <div class="flex min-h-screen" id="app-layout">
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar w-[72px] lg:w-[260px] min-h-screen flex flex-col py-6 px-3 lg:px-4 shrink-0" id="sidebar">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-3 mb-10 animate-fade-in">
+        <span class="material-symbols-outlined text-primary-fixed-dim text-3xl"
+          style="font-variation-settings: 'FILL' 1;">sports_soccer</span>
+        <span class="hidden lg:block font-display text-xl font-bold text-white tracking-tight">Futora</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 space-y-1" id="main-nav">
+        <div class="tooltip-wrapper">
+          <a href="#" class="nav-item active flex items-center gap-3 px-3 py-3 text-white" data-page="dashboard"
+            onclick="switchPage('dashboard', this)">
+            <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+            <span class="hidden lg:block text-sm font-medium">Dashboard</span>
+          </a>
+          <span class="tooltip-text lg:hidden">Dashboard</span>
+        </div>
+        <div class="tooltip-wrapper">
+          <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 text-white/60" data-page="predictions"
+            onclick="switchPage('predictions', this)">
+            <span class="material-symbols-outlined text-xl">psychology</span>
+            <span class="hidden lg:block text-sm font-medium">AI Predictions</span>
+          </a>
+          <span class="tooltip-text lg:hidden">AI Predictions</span>
+        </div>
+        <div class="tooltip-wrapper">
+          <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 text-white/60" data-page="analytics"
+            onclick="switchPage('analytics', this)">
+            <span class="material-symbols-outlined text-xl">monitoring</span>
+            <span class="hidden lg:block text-sm font-medium">Analytics</span>
+          </a>
+          <span class="tooltip-text lg:hidden">Analytics</span>
+        </div>
+        <div class="tooltip-wrapper">
+          <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 text-white/60" data-page="matches"
+            onclick="switchPage('matches', this)">
+            <span class="material-symbols-outlined text-xl">stadium</span>
+            <span class="hidden lg:block text-sm font-medium">Live Matches</span>
+          </a>
+          <span class="tooltip-text lg:hidden">Live Matches</span>
+        </div>
+        <div class="tooltip-wrapper">
+          <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 text-white/60" data-page="academy"
+            onclick="switchPage('academy', this)">
+            <span class="material-symbols-outlined text-xl">school</span>
+            <span class="hidden lg:block text-sm font-medium">Academy</span>
+          </a>
+          <span class="tooltip-text lg:hidden">Academy</span>
+        </div>
+        <div class="tooltip-wrapper">
+          <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 text-white/60" data-page="var"
+            onclick="switchPage('var', this)">
+            <span class="material-symbols-outlined text-xl">videocam</span>
+            <span class="hidden lg:block text-sm font-medium">VAR Analysis</span>
+          </a>
+          <span class="tooltip-text lg:hidden">VAR Analysis</span>
+        </div>
+
+        <!-- Divider -->
+        <div class="h-px bg-white/10 my-4 mx-2"></div>
+
+        <div class="tooltip-wrapper">
+          <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 text-white/60" data-page="settings"
+            onclick="switchPage('settings', this)">
+            <span class="material-symbols-outlined text-xl">settings</span>
+            <span class="hidden lg:block text-sm font-medium">Settings</span>
+          </a>
+          <span class="tooltip-text lg:hidden">Settings</span>
+        </div>
+      </nav>
+
+      <!-- User Profile -->
+      <div class="mt-auto pt-4 border-t border-white/10">
+        <div class="flex items-center gap-3 px-3 py-2">
+          <div id="sidebar-initials"
+            class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0">
+            VS</div>
+          <div class="hidden lg:block overflow-hidden">
+            <p id="sidebar-name" class="text-sm font-medium text-white truncate">Vedant Singh</p>
+            <p id="sidebar-email" class="text-xs text-white/50 truncate">vedantsingh257@gmail.com</p>
+          </div>
+          <a href="#" onclick="handleSignOut(event)"
+            class="hidden lg:block ml-auto text-white/40 hover:text-white transition-colors" title="Sign Out">
+            <span class="material-symbols-outlined text-lg">logout</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 overflow-y-auto min-h-screen">
+
+      <!-- Top Bar -->
+      <header
+        class="sticky top-0 z-30 glass-panel px-6 lg:px-10 py-4 flex items-center justify-between animate-fade-in">
+        <!-- Mobile hamburger -->
+        <button class="lg:hidden p-2 -ml-2 text-on-surface-variant hover:text-on-surface"
+          onclick="toggleMobileSidebar()" id="hamburger-btn">
+          <span class="material-symbols-outlined text-2xl">menu</span>
+        </button>
+
+        <div>
+          <h1 class="font-display text-2xl lg:text-3xl font-semibold text-on-background" id="page-title">Intelligence
+            Dashboard</h1>
+          <p class="text-sm text-on-surface-variant mt-0.5" id="page-subtitle">FIFA World Cup 2026 — Real-time AI
+            Insights</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Search -->
+          <div class="relative">
+            <div
+              class="hidden md:flex items-center bg-surface-container-low rounded-xl px-4 py-2.5 gap-2 border border-outline-variant/50 focus-within:border-primary transition-colors">
+              <span class="material-symbols-outlined text-outline text-lg">search</span>
+              <input type="text" placeholder="Search (Ctrl+K)..."
+                class="bg-transparent border-none outline-none text-sm w-48 placeholder:text-outline" id="global-search"
+                oninput="handleSearch()" />
+            </div>
+            <div id="search-results"
+              class="hidden absolute top-full mt-2 w-full bg-white dark:bg-[#2c2219] border border-outline-variant/30 rounded-xl shadow-lg max-h-60 overflow-y-auto z-50">
+            </div>
+          </div>
+          <!-- Notifications -->
+          <div class="relative">
+            <button class="relative p-2.5 rounded-xl hover:bg-surface-container-high transition-colors"
+              id="notification-btn" onclick="toggleNotifications(event)">
+              <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+              <span
+                class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background"></span>
+            </button>
+            <!-- Notifications Dropdown -->
+            <div id="notification-panel"
+              class="hidden absolute top-full right-0 mt-2 w-80 bg-white dark:bg-[#2c2219] border border-outline-variant/30 rounded-2xl shadow-xl z-50 overflow-hidden">
+              <div class="p-4 border-b border-outline-variant/30 flex justify-between items-center">
+                <h3 class="font-semibold text-on-background">Notifications</h3>
+                <span class="text-xs text-primary font-bold bg-primary/10 px-2 py-1 rounded-full">3 New</span>
+              </div>
+              <div class="max-h-80 overflow-y-auto">
+                <div
+                  class="p-4 border-b border-outline-variant/30 hover:bg-surface-container-low cursor-pointer transition-colors">
+                  <div class="flex gap-3">
+                    <div class="text-xl">⚽</div>
+                    <div>
+                      <p class="text-sm font-semibold text-on-background">Goal! Brazil (2) - (1) Germany</p>
+                      <p class="text-xs text-on-surface-variant mt-1">Endrick scores in the 54th minute.</p>
+                      <p class="text-[10px] text-outline mt-1">2 mins ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="p-4 border-b border-outline-variant/30 hover:bg-surface-container-low cursor-pointer transition-colors">
+                  <div class="flex gap-3">
+                    <div class="text-xl">🤖</div>
+                    <div>
+                      <p class="text-sm font-semibold text-on-background">AI Insight Generated</p>
+                      <p class="text-xs text-on-surface-variant mt-1">New pressing metrics available for Spain vs
+                        England.</p>
+                      <p class="text-[10px] text-outline mt-1">15 mins ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-4 hover:bg-surface-container-low cursor-pointer transition-colors">
+                  <div class="flex gap-3">
+                    <div class="text-xl">📈</div>
+                    <div>
+                      <p class="text-sm font-semibold text-on-background">Prediction Updated</p>
+                      <p class="text-xs text-on-surface-variant mt-1">Argentina win probability increased to 62%.</p>
+                      <p class="text-[10px] text-outline mt-1">1 hour ago</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3 border-t border-outline-variant/30 text-center bg-surface-container-low">
+                <button class="text-xs text-primary font-bold hover:underline" onclick="toggleNotifications()">Mark all
+                  as read</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Container -->
+      <div class="px-6 lg:px-10 py-8" id="page-content">
+
+        <!-- ===== DASHBOARD PAGE ===== -->
+        <div id="page-dashboard">
+
+          <!-- Stats Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-10">
+            <!-- Stat 1 -->
+            <div class="stat-card p-6 animate-fade-up delay-1">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary">sports_soccer</span>
+                </div>
+                <span class="text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-full">+12%</span>
+              </div>
+              <p class="text-3xl font-headline font-bold text-on-background">48</p>
+              <p class="text-sm text-on-surface-variant mt-1">Matches Analyzed</p>
+            </div>
+            <!-- Stat 2 -->
+            <div class="stat-card p-6 animate-fade-up delay-2">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-11 h-11 rounded-2xl bg-tertiary/10 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-tertiary">target</span>
+                </div>
+                <span class="text-xs font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-full">89.3%</span>
+              </div>
+              <p class="text-3xl font-headline font-bold text-on-background">89.3%</p>
+              <p class="text-sm text-on-surface-variant mt-1">Prediction Accuracy</p>
+            </div>
+            <!-- Stat 3 -->
+            <div class="stat-card p-6 animate-fade-up delay-3">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-11 h-11 rounded-2xl bg-primary-container/30 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary-container">group</span>
+                </div>
+                <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">736</span>
+              </div>
+              <p class="text-3xl font-headline font-bold text-on-background">736</p>
+              <p class="text-sm text-on-surface-variant mt-1">Players Tracked</p>
+            </div>
+            <!-- Stat 4 -->
+            <div class="stat-card p-6 animate-fade-up delay-4">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-11 h-11 rounded-2xl bg-green-100 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-green-600">live_tv</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-red-500 live-dot"></span>
+                  <span class="text-xs font-bold text-red-600">LIVE</span>
+                </div>
+              </div>
+              <p class="text-3xl font-headline font-bold text-on-background">3</p>
+              <p class="text-sm text-on-surface-variant mt-1">Live Matches Now</p>
+            </div>
+          </div>
+
+          <!-- Main Grid -->
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+            <!-- Left Column (2/3) -->
+            <div class="xl:col-span-2 space-y-6">
+
+              <!-- Live Match Spotlight -->
+              <div class="stat-card overflow-hidden animate-fade-up delay-3">
+                <div class="bg-gradient-to-r from-sidebar-dark to-[#3d2a1a] p-6 lg:p-8">
+                  <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-red-500 live-dot"></span>
+                      <span class="text-xs font-bold text-red-400 uppercase tracking-wider">Live Now</span>
+                    </div>
+                    <span class="text-xs text-white/50 font-medium">Group A — Matchday 2</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <!-- Team A -->
+                    <div class="text-center flex-1">
+                      <div
+                        class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">
+                        🇧🇷</div>
+                      <p class="text-white font-bold text-lg">Brazil</p>
+                      <p class="text-white/40 text-xs mt-1">FIFA #5</p>
+                    </div>
+                    <!-- Score -->
+                    <div class="text-center px-8">
+                      <div class="flex items-center gap-4">
+                        <span class="text-5xl font-headline font-bold text-white">2</span>
+                        <span class="text-2xl text-white/30">—</span>
+                        <span class="text-5xl font-headline font-bold text-white" id="team-b-score">1</span>
+                      </div>
+                      <div class="mt-3 px-4 py-1.5 bg-red-500/20 rounded-full">
+                        <span class="text-red-400 text-xs font-bold live-clock-text">67:32</span>
+                      </div>
+                    </div>
+                    <!-- Team B -->
+                    <div class="text-center flex-1">
+                      <div
+                        class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">
+                        🇩🇪</div>
+                      <p class="text-white font-bold text-lg">Germany</p>
+                      <p class="text-white/40 text-xs mt-1">FIFA #12</p>
+                    </div>
+                  </div>
+                  <!-- Match Events -->
+                  <div class="flex flex-wrap items-center justify-center gap-6 mt-6 text-xs text-white/50"
+                    id="live-match-events">
+                    <span>⚽ Vinicius Jr. 23'</span>
+                    <span>⚽ Endrick 54'</span>
+                    <span class="text-white/30">|</span>
+                    <span>⚽ Wirtz 38'</span>
+                  </div>
+                </div>
+                <!-- AI Insight Bar -->
+                <div class="px-6 lg:px-8 py-4 bg-primary/5 flex items-center gap-3">
+                  <span class="material-symbols-outlined text-primary text-lg">auto_awesome</span>
+                  <p class="text-sm text-on-surface-variant transition-opacity duration-500" id="ai-insight-text">
+                    <strong class="text-on-background">AI Insight:</strong>
+                    Brazil's pressing intensity increased 34% since the 50th minute. Expected goals (xG): BRA 2.4 — GER
+                    1.1
+                  </p>
+                </div>
+              </div>
+
+              <!-- AI Prediction Confidence -->
+              <div class="stat-card p-6 lg:p-8 animate-fade-up delay-4">
+                <div class="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 class="font-display text-xl font-semibold">AI Match Predictions</h3>
+                    <p class="text-sm text-on-surface-variant mt-1">Upcoming fixtures with win probability</p>
+                  </div>
+                  <button class="text-sm text-primary font-semibold hover:underline underline-offset-4">View
+                    All</button>
+                </div>
+                <div class="space-y-5" id="dashboard-predictions-container">
+                  <!-- Dynamically populated by MatchDataEngine -->
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Column (1/3) -->
+            <div class="space-y-6">
+
+              <!-- Tournament Progress -->
+              <div class="stat-card p-6 animate-fade-up delay-4">
+                <h3 class="font-display text-lg font-semibold mb-5">Tournament Progress</h3>
+                <div class="relative">
+                  <!-- Progress Circle (SVG) -->
+                  <div class="flex justify-center mb-5">
+                    <svg width="140" height="140" viewBox="0 0 140 140">
+                      <circle cx="70" cy="70" r="58" fill="none" stroke="#ece6dc" stroke-width="10" />
+                      <circle cx="70" cy="70" r="58" fill="none" stroke="#c2652a" stroke-width="10"
+                        stroke-dasharray="364.4" stroke-dashoffset="218.6" stroke-linecap="round"
+                        transform="rotate(-90 70 70)" style="transition: stroke-dashoffset 1.5s ease;" />
+                      <text x="70" y="65" text-anchor="middle" class="text-2xl font-bold" fill="#3a302a"
+                        font-family="Eb Garamond" font-size="28" font-weight="700">40%</text>
+                      <text x="70" y="85" text-anchor="middle" fill="#9a9088" font-family="Manrope"
+                        font-size="11">Complete</text>
+                    </svg>
+                  </div>
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-on-surface-variant">Group Stage</span>
+                      <span class="font-bold text-primary">In Progress</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-on-surface-variant">Round of 32</span>
+                      <span class="text-outline">Upcoming</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-on-surface-variant">Quarter Finals</span>
+                      <span class="text-outline">—</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-on-surface-variant">Final</span>
+                      <span class="text-outline">—</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top Performers -->
+              <div class="stat-card p-6 animate-fade-up delay-5">
+                <div class="flex items-center justify-between mb-5">
+                  <h3 class="font-display text-lg font-semibold">Top Performers</h3>
+                  <div class="flex gap-1">
+                    <button class="tab-btn active text-xs font-bold px-2 text-primary"
+                      onclick="switchPlayerTab('goals', this)">Goals</button>
+                    <button class="tab-btn text-xs font-bold px-2 text-on-surface-variant"
+                      onclick="switchPlayerTab('assists', this)">Assists</button>
+                    <button class="tab-btn text-xs font-bold px-2 text-on-surface-variant"
+                      onclick="switchPlayerTab('rating', this)">Rating</button>
+                  </div>
+                </div>
+
+                <div id="player-list" class="space-y-4">
+                  <!-- Player 1 -->
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-on-surface-variant w-5">1</span>
+                    <div
+                      class="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-lg font-bold text-primary">
+                      M</div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold truncate">Kylian Mbappé</p>
+                      <p class="text-xs text-on-surface-variant">France</p>
+                    </div>
+                    <span class="text-lg font-headline font-bold text-on-background">5</span>
+                  </div>
+                  <!-- Player 2 -->
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-on-surface-variant w-5">2</span>
+                    <div
+                      class="w-10 h-10 rounded-full bg-gradient-to-br from-tertiary/20 to-tertiary/5 flex items-center justify-center text-lg font-bold text-tertiary">
+                      V</div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold truncate">Vinícius Jr.</p>
+                      <p class="text-xs text-on-surface-variant">Brazil</p>
+                    </div>
+                    <span class="text-lg font-headline font-bold text-on-background">4</span>
+                  </div>
+                  <!-- Player 3 -->
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-on-surface-variant w-5">3</span>
+                    <div
+                      class="w-10 h-10 rounded-full bg-gradient-to-br from-[#2d6a4f]/20 to-[#2d6a4f]/5 flex items-center justify-center text-lg font-bold text-[#2d6a4f]">
+                      H</div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold truncate">Erling Haaland</p>
+                      <p class="text-xs text-on-surface-variant">Norway</p>
+                    </div>
+                    <span class="text-lg font-headline font-bold text-on-background">4</span>
+                  </div>
+                  <!-- Player 4 -->
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-on-surface-variant w-5">4</span>
+                    <div
+                      class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-lg font-bold text-blue-600">
+                      B</div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold truncate">Jude Bellingham</p>
+                      <p class="text-xs text-on-surface-variant">England</p>
+                    </div>
+                    <span class="text-lg font-headline font-bold text-on-background">3</span>
+                  </div>
+                  <!-- Player 5 -->
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-on-surface-variant w-5">5</span>
+                    <div
+                      class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-500/5 flex items-center justify-center text-lg font-bold text-amber-600">
+                      Y</div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold truncate">Lamine Yamal</p>
+                      <p class="text-xs text-on-surface-variant">Spain</p>
+                    </div>
+                    <span class="text-lg font-headline font-bold text-on-background">3</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Model Status -->
+              <div class="stat-card p-6 animate-fade-up delay-6">
+                <h3 class="font-display text-lg font-semibold mb-4">AI Engine Status</h3>
+                <div class="space-y-4">
+                  <div>
+                    <div class="flex items-center justify-between text-sm mb-2">
+                      <span class="text-on-surface-variant">Match Outcome Model</span>
+                      <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Active</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill bg-gradient-to-r from-primary to-primary-container"
+                        style="--target-width: 94%;"></div>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mt-1">Confidence: 94%</p>
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between text-sm mb-2">
+                      <span class="text-on-surface-variant">Player Performance</span>
+                      <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Active</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill bg-gradient-to-r from-tertiary to-tertiary-container"
+                        style="--target-width: 87%;"></div>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mt-1">Confidence: 87%</p>
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between text-sm mb-2">
+                      <span class="text-on-surface-variant">Injury Risk Analysis</span>
+                      <span
+                        class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Training</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill bg-gradient-to-r from-amber-400 to-amber-300"
+                        style="--target-width: 72%;"></div>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mt-1">Confidence: 72%</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div><!-- /page-dashboard -->
+
+
+        <!-- ===== PREDICTIONS PAGE ===== -->
+        <div id="page-predictions" class="hidden">
+          <div class="max-w-4xl mx-auto">
+            <div class="stat-card p-8 mb-6 animate-fade-up">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary text-2xl">psychology</span>
+                </div>
+                <div>
+                  <h2 class="font-display text-2xl font-semibold">AI Prediction Engine</h2>
+                  <p class="text-sm text-on-surface-variant">Deep learning model trained on 50,000+ historical matches
+                  </p>
+                </div>
+              </div>
+
+              <!-- Model Stats -->
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="bg-surface-container-low rounded-2xl p-4 text-center">
+                  <p class="text-3xl font-headline font-bold text-primary">89.3%</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Overall Accuracy</p>
+                </div>
+                <div class="bg-surface-container-low rounded-2xl p-4 text-center">
+                  <p class="text-3xl font-headline font-bold text-tertiary">2.1M</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Data Points</p>
+                </div>
+                <div class="bg-surface-container-low rounded-2xl p-4 text-center">
+                  <p class="text-3xl font-headline font-bold text-[#2d6a4f]">156</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Features Used</p>
+                </div>
+              </div>
+
+              <h3 class="font-display text-lg font-semibold mb-4">Tournament Winner Probability</h3>
+              <div class="space-y-3">
+                <div>
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="flex items-center gap-2">🇦🇷 Argentina</span>
+                    <span class="font-bold text-primary">22.4%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill bg-primary" style="--target-width: 22.4%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="flex items-center gap-2">🇫🇷 France</span>
+                    <span class="font-bold text-primary">18.7%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill bg-primary/80" style="--target-width: 18.7%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="flex items-center gap-2">🇧🇷 Brazil</span>
+                    <span class="font-bold text-primary">15.2%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill bg-primary/60" style="--target-width: 15.2%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="flex items-center gap-2">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</span>
+                    <span class="font-bold text-primary">12.1%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill bg-primary/50" style="--target-width: 12.1%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="flex items-center gap-2">🇪🇸 Spain</span>
+                    <span class="font-bold text-primary">10.8%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill bg-primary/40" style="--target-width: 10.8%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="flex items-center gap-2">🇩🇪 Germany</span>
+                    <span class="font-bold text-primary">8.5%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill bg-primary/30" style="--target-width: 8.5%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Match Predictions Grid -->
+          <div class="stat-card p-8 mb-6 animate-fade-up delay-1">
+            <h3 class="font-display text-xl font-semibold mb-6">Upcoming Match Predictions</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="predictions-page-grid">
+              <!-- Dynamically populated by MatchDataEngine -->
+            </div>
+          </div>
+
+          <!-- Head-to-Head Section -->
+          <div class="stat-card p-8 mb-6 animate-fade-up delay-2">
+            <h3 class="font-display text-xl font-semibold mb-6">Head-to-Head Explorer</h3>
+            <div class="flex items-center gap-4 mb-6">
+              <select id="h2h-team1"
+                class="flex-1 bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary"
+                onchange="updateH2H()">
+                <option value="ARG" selected>Argentina</option>
+                <option value="BRA">Brazil</option>
+                <option value="FRA">France</option>
+                <option value="ESP">Spain</option>
+                <option value="ENG">England</option>
+              </select>
+              <span class="text-lg font-bold text-outline">VS</span>
+              <select id="h2h-team2"
+                class="flex-1 bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary"
+                onchange="updateH2H()">
+                <option value="FRA" selected>France</option>
+                <option value="BRA">Brazil</option>
+                <option value="ARG">Argentina</option>
+                <option value="ESP">Spain</option>
+                <option value="ENG">England</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-3 gap-4 text-center mb-6">
+              <div class="bg-surface-container-low p-4 rounded-xl">
+                <p class="text-2xl font-bold text-primary" id="h2h-wins1">6</p>
+                <p class="text-[10px] text-on-surface-variant uppercase tracking-wide mt-1">Wins (Team 1)</p>
+              </div>
+              <div class="bg-surface-container-low p-4 rounded-xl">
+                <p class="text-2xl font-bold text-outline" id="h2h-draws">3</p>
+                <p class="text-[10px] text-on-surface-variant uppercase tracking-wide mt-1">Draws</p>
+              </div>
+              <div class="bg-surface-container-low p-4 rounded-xl">
+                <p class="text-2xl font-bold text-tertiary" id="h2h-wins2">4</p>
+                <p class="text-[10px] text-on-surface-variant uppercase tracking-wide mt-1">Wins (Team 2)</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-sm font-semibold mb-3">Last 5 Meetings</p>
+              <div class="flex gap-2 justify-center" id="h2h-last5">
+                <span
+                  class="w-8 h-8 rounded bg-primary/20 text-primary flex items-center justify-center font-bold text-xs"
+                  title="Team 1 Win">W</span>
+                <span
+                  class="w-8 h-8 rounded bg-tertiary/20 text-tertiary flex items-center justify-center font-bold text-xs"
+                  title="Team 2 Win">L</span>
+                <span
+                  class="w-8 h-8 rounded bg-outline/20 text-outline flex items-center justify-center font-bold text-xs"
+                  title="Draw">D</span>
+                <span
+                  class="w-8 h-8 rounded bg-primary/20 text-primary flex items-center justify-center font-bold text-xs"
+                  title="Team 1 Win">W</span>
+                <span
+                  class="w-8 h-8 rounded bg-primary/20 text-primary flex items-center justify-center font-bold text-xs"
+                  title="Team 1 Win">W</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prediction History Table -->
+          <div class="stat-card p-8 animate-fade-up delay-3 overflow-x-auto">
+            <h3 class="font-display text-xl font-semibold mb-6">Prediction History</h3>
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-on-surface-variant uppercase border-b border-outline-variant/30">
+                <tr>
+                  <th class="px-4 py-3">Match</th>
+                  <th class="px-4 py-3">Predicted</th>
+                  <th class="px-4 py-3">Actual Result</th>
+                  <th class="px-4 py-3 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-outline-variant/10">
+                  <td class="px-4 py-3 font-semibold">POR vs CZE</td>
+                  <td class="px-4 py-3 text-primary">POR Win (72%)</td>
+                  <td class="px-4 py-3">POR 2 - 1 CZE</td>
+                  <td class="px-4 py-3 text-center"><span
+                      class="inline-block px-2 py-1 bg-green-500/20 text-green-700 text-xs rounded-full">✓
+                      Correct</span></td>
+                </tr>
+                <tr class="border-b border-outline-variant/10">
+                  <td class="px-4 py-3 font-semibold">BEL vs SVK</td>
+                  <td class="px-4 py-3 text-primary">BEL Win (65%)</td>
+                  <td class="px-4 py-3">BEL 0 - 1 SVK</td>
+                  <td class="px-4 py-3 text-center"><span
+                      class="inline-block px-2 py-1 bg-red-500/20 text-red-700 text-xs rounded-full">✗ Wrong</span></td>
+                </tr>
+                <tr class="border-b border-outline-variant/10">
+                  <td class="px-4 py-3 font-semibold">AUT vs FRA</td>
+                  <td class="px-4 py-3 text-primary">FRA Win (58%)</td>
+                  <td class="px-4 py-3">AUT 0 - 1 FRA</td>
+                  <td class="px-4 py-3 text-center"><span
+                      class="inline-block px-2 py-1 bg-green-500/20 text-green-700 text-xs rounded-full">✓
+                      Correct</span></td>
+                </tr>
+                <tr class="border-b border-outline-variant/10">
+                  <td class="px-4 py-3 font-semibold">GER vs SCO</td>
+                  <td class="px-4 py-3 text-primary">GER Win (80%)</td>
+                  <td class="px-4 py-3">GER 5 - 1 SCO</td>
+                  <td class="px-4 py-3 text-center"><span
+                      class="inline-block px-2 py-1 bg-green-500/20 text-green-700 text-xs rounded-full">✓
+                      Correct</span></td>
+                </tr>
+                <tr class="border-b border-outline-variant/10">
+                  <td class="px-4 py-3 font-semibold">CRO vs ALB</td>
+                  <td class="px-4 py-3 text-primary">CRO Win (61%)</td>
+                  <td class="px-4 py-3">CRO 2 - 2 ALB</td>
+                  <td class="px-4 py-3 text-center"><span
+                      class="inline-block px-2 py-1 bg-red-500/20 text-red-700 text-xs rounded-full">✗ Wrong</span></td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-semibold">ESP vs CRO</td>
+                  <td class="px-4 py-3 text-primary">ESP Win (52%)</td>
+                  <td class="px-4 py-3">ESP 3 - 0 CRO</td>
+                  <td class="px-4 py-3 text-center"><span
+                      class="inline-block px-2 py-1 bg-green-500/20 text-green-700 text-xs rounded-full">✓
+                      Correct</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /page-predictions -->
+
+
+        <!-- ===== ANALYTICS PAGE ===== -->
+        <div id="page-analytics" class="hidden">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="font-display text-2xl font-semibold text-on-background">Tactical Analytics</h2>
+            <select id="analytics-team-select"
+              class="bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary"
+              onchange="updateAnalytics()">
+              <option value="BRA">Brazil</option>
+              <option value="FRA">France</option>
+              <option value="ARG">Argentina</option>
+              <option value="ENG">England</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+            <!-- Possession Heatmap -->
+            <div class="stat-card p-6 lg:p-8 animate-fade-up">
+              <h3 class="font-display text-xl font-semibold mb-2">Team Possession Heatmap</h3>
+              <p class="text-sm text-on-surface-variant mb-6">Average ball possession zones — Group Stage</p>
+              <div class="bg-[#2d6a4f]/10 rounded-2xl p-6 relative" style="aspect-ratio: 2/1.2;">
+                <!-- Pitch outline -->
+                <div class="absolute inset-6 border-2 border-[#2d6a4f]/20 rounded-xl">
+                  <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-[#2d6a4f]/20"></div>
+                  <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-2 border-[#2d6a4f]/20">
+                  </div>
+                </div>
+                <!-- Heatmap zones -->
+                <div class="absolute inset-6 grid grid-cols-6 grid-rows-3 gap-1 p-2" id="heatmap-grid">
+                  <!-- JS Generated -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Pass Network -->
+            <div class="stat-card p-6 lg:p-8 animate-fade-up delay-1">
+              <h3 class="font-display text-xl font-semibold mb-2">Passing Accuracy by Zone</h3>
+              <p class="text-sm text-on-surface-variant mb-6">Average pass completion rates</p>
+              <div class="space-y-4">
+                <div>
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-on-surface-variant">Defensive Third</span>
+                    <span class="font-bold">92.1%</span>
+                  </div>
+                  <div class="progress-bar h-4 rounded-xl">
+                    <div class="progress-fill bg-gradient-to-r from-[#2d6a4f] to-[#52b788] rounded-xl"
+                      style="--target-width: 92.1%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-on-surface-variant">Middle Third</span>
+                    <span class="font-bold">86.4%</span>
+                  </div>
+                  <div class="progress-bar h-4 rounded-xl">
+                    <div class="progress-fill bg-gradient-to-r from-primary to-primary-container rounded-xl"
+                      style="--target-width: 86.4%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-on-surface-variant">Attacking Third</span>
+                    <span class="font-bold">74.8%</span>
+                  </div>
+                  <div class="progress-bar h-4 rounded-xl">
+                    <div class="progress-fill bg-gradient-to-r from-tertiary to-tertiary-container rounded-xl"
+                      style="--target-width: 74.8%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-on-surface-variant">Final Third (Key Passes)</span>
+                    <span class="font-bold">61.2%</span>
+                  </div>
+                  <div class="progress-bar h-4 rounded-xl">
+                    <div class="progress-fill bg-gradient-to-r from-amber-500 to-amber-300 rounded-xl"
+                      style="--target-width: 61.2%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-8 p-4 bg-primary/5 rounded-2xl flex items-start gap-3">
+                <span class="material-symbols-outlined text-primary mt-0.5">auto_awesome</span>
+                <p class="text-sm text-on-surface-variant"><strong class="text-on-background">Key Insight:</strong>
+                  Teams with &gt;80% pass accuracy in the middle third have a 73% win rate in this tournament.</p>
+              </div>
+            </div>
+
+            <!-- Sprint & Physical Data -->
+            <div class="stat-card p-6 lg:p-8 animate-fade-up delay-2 xl:col-span-2">
+              <h3 class="font-display text-xl font-semibold mb-2">Physical Performance Metrics</h3>
+              <p class="text-sm text-on-surface-variant mb-6">Average per match — Top 8 Teams</p>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-outline-variant/50">
+                      <th class="text-left py-3 px-3 font-semibold text-on-surface-variant">Team</th>
+                      <th class="text-center py-3 px-3 font-semibold text-on-surface-variant">Distance (km)</th>
+                      <th class="text-center py-3 px-3 font-semibold text-on-surface-variant">Sprints</th>
+                      <th class="text-center py-3 px-3 font-semibold text-on-surface-variant">Top Speed (km/h)</th>
+                      <th class="text-center py-3 px-3 font-semibold text-on-surface-variant">Press Intensity</th>
+                      <th class="text-center py-3 px-3 font-semibold text-on-surface-variant">Recovery Rate</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                      <td class="py-3 px-3 font-medium">🇩🇪 Germany</td>
+                      <td class="text-center py-3 px-3">117.3</td>
+                      <td class="text-center py-3 px-3">214</td>
+                      <td class="text-center py-3 px-3">34.2</td>
+                      <td class="text-center py-3 px-3"><span class="text-green-600 font-bold">High</span></td>
+                      <td class="text-center py-3 px-3">91%</td>
+                    </tr>
+                    <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                      <td class="py-3 px-3 font-medium">🇫🇷 France</td>
+                      <td class="text-center py-3 px-3">113.8</td>
+                      <td class="text-center py-3 px-3">198</td>
+                      <td class="text-center py-3 px-3">36.1</td>
+                      <td class="text-center py-3 px-3"><span class="text-primary font-bold">Medium</span></td>
+                      <td class="text-center py-3 px-3">88%</td>
+                    </tr>
+                    <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                      <td class="py-3 px-3 font-medium">🇪🇸 Spain</td>
+                      <td class="text-center py-3 px-3">115.1</td>
+                      <td class="text-center py-3 px-3">178</td>
+                      <td class="text-center py-3 px-3">33.4</td>
+                      <td class="text-center py-3 px-3"><span class="text-green-600 font-bold">High</span></td>
+                      <td class="text-center py-3 px-3">93%</td>
+                    </tr>
+                    <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+                      <td class="py-3 px-3 font-medium">🇦🇷 Argentina</td>
+                      <td class="text-center py-3 px-3">108.6</td>
+                      <td class="text-center py-3 px-3">168</td>
+                      <td class="text-center py-3 px-3">34.8</td>
+                      <td class="text-center py-3 px-3"><span class="text-primary font-bold">Medium</span></td>
+                      <td class="text-center py-3 px-3">85%</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                      <td class="py-3 px-3 font-medium">🇧🇷 Brazil</td>
+                      <td class="text-center py-3 px-3">110.2</td>
+                      <td class="text-center py-3 px-3">205</td>
+                      <td class="text-center py-3 px-3">35.7</td>
+                      <td class="text-center py-3 px-3"><span class="text-green-600 font-bold">High</span></td>
+                      <td class="text-center py-3 px-3">87%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <!-- Shot Map -->
+          <div class="stat-card p-6 lg:p-8 animate-fade-up delay-2">
+            <h3 class="font-display text-xl font-semibold mb-2">Shot Map</h3>
+            <p class="text-sm text-on-surface-variant mb-6">Attacking third shot locations</p>
+            <div class="bg-[#2d6a4f]/10 rounded-2xl relative overflow-hidden flex justify-center py-4"
+              style="aspect-ratio: 2/1.5;">
+              <!-- Half pitch SVG -->
+              <svg viewBox="0 0 100 80" class="w-full h-full opacity-60">
+                <rect x="0" y="0" width="100" height="80" fill="none" stroke="#2d6a4f" stroke-width="0.5" />
+                <!-- Penalty Area -->
+                <rect x="20" y="0" width="60" height="18" fill="none" stroke="#2d6a4f" stroke-width="0.5" />
+                <!-- Goal Area -->
+                <rect x="36" y="0" width="28" height="6" fill="none" stroke="#2d6a4f" stroke-width="0.5" />
+                <!-- Penalty Spot -->
+                <circle cx="50" cy="12" r="0.5" fill="#2d6a4f" />
+                <!-- D -->
+                <path d="M 36,18 A 12,12 0 0,0 64,18" fill="none" stroke="#2d6a4f" stroke-width="0.5" />
+
+                <!-- Shots -->
+                <circle cx="50" cy="10" r="2" fill="#22c55e" opacity="0.8" title="Goal" />
+                <circle cx="45" cy="8" r="2" fill="#eab308" opacity="0.8" title="Saved" />
+                <circle cx="55" cy="15" r="2" fill="#22c55e" opacity="0.8" title="Goal" />
+                <circle cx="30" cy="20" r="2" fill="#ef4444" opacity="0.8" title="Miss" />
+                <circle cx="70" cy="18" r="2" fill="#eab308" opacity="0.8" title="Saved" />
+                <circle cx="48" cy="25" r="2" fill="#ef4444" opacity="0.8" title="Miss" />
+                <circle cx="60" cy="12" r="2" fill="#22c55e" opacity="0.8" title="Goal" />
+              </svg>
+              <!-- Legend -->
+              <div
+                class="absolute bottom-4 left-4 flex gap-4 text-xs font-semibold bg-surface/80 px-3 py-2 rounded-lg backdrop-blur">
+                <div class="flex items-center gap-1">
+                  <div class="w-3 h-3 rounded-full bg-[#22c55e]"></div> Goal
+                </div>
+                <div class="flex items-center gap-1">
+                  <div class="w-3 h-3 rounded-full bg-[#eab308]"></div> Saved
+                </div>
+                <div class="flex items-center gap-1">
+                  <div class="w-3 h-3 rounded-full bg-[#ef4444]"></div> Miss
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formation Diagram -->
+          <div class="stat-card p-6 lg:p-8 animate-fade-up delay-3">
+            <h3 class="font-display text-xl font-semibold mb-2">Average Formation</h3>
+            <p class="text-sm text-on-surface-variant mb-6">4-3-3 Attacking Shape</p>
+            <div class="bg-[#2d6a4f]/10 rounded-2xl relative overflow-hidden py-4 h-full min-h-[300px]">
+              <!-- Full Pitch vertically -->
+              <svg viewBox="0 0 100 120" class="w-full h-full absolute inset-0 opacity-40">
+                <rect x="5" y="5" width="90" height="110" fill="none" stroke="#2d6a4f" stroke-width="1" />
+                <line x1="5" y1="60" x2="95" y2="60" stroke="#2d6a4f" stroke-width="1" />
+                <circle cx="50" cy="60" r="10" fill="none" stroke="#2d6a4f" stroke-width="1" />
+                <!-- Penalty Areas -->
+                <rect x="25" y="5" width="50" height="15" fill="none" stroke="#2d6a4f" stroke-width="1" />
+                <rect x="25" y="100" width="50" height="15" fill="none" stroke="#2d6a4f" stroke-width="1" />
+              </svg>
+
+              <!-- Players -->
+              <div class="absolute inset-0">
+                <!-- FW -->
+                <div class="absolute top-[20%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    9</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Endrick</span>
+                </div>
+                <div class="absolute top-[25%] left-[25%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    11</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Vinicius</span>
+                </div>
+                <div class="absolute top-[25%] left-[75%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    10</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Rodrygo</span>
+                </div>
+
+                <!-- MID -->
+                <div class="absolute top-[45%] left-[35%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary/80 text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    8</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Paqueta</span>
+                </div>
+                <div class="absolute top-[50%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary/80 text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    5</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Casemiro</span>
+                </div>
+                <div class="absolute top-[45%] left-[65%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary/80 text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    7</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Guimaraes</span>
+                </div>
+
+                <!-- DEF -->
+                <div class="absolute top-[75%] left-[20%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-tertiary text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    6</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Wendell</span>
+                </div>
+                <div class="absolute top-[80%] left-[40%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-tertiary text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    4</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Marquinhos</span>
+                </div>
+                <div class="absolute top-[80%] left-[60%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-tertiary text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    3</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Militao</span>
+                </div>
+                <div class="absolute top-[75%] left-[80%] -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-tertiary text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    2</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Danilo</span>
+                </div>
+
+                <!-- GK -->
+                <div class="absolute top-[90%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-[#eab308] text-white flex justify-center items-center font-bold text-xs shadow-lg">
+                    1</div><span class="text-[10px] font-bold mt-1 bg-surface/80 px-1 rounded">Alisson</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-analytics -->
+
+
+      <!-- ===== LIVE MATCHES PAGE ===== -->
+      <div id="page-matches" class="hidden">
+        <div class="space-y-6 max-w-4xl mx-auto">
+          <div class="flex items-center gap-2 mb-2 animate-fade-up">
+            <span class="w-3 h-3 rounded-full bg-red-500 live-dot"></span>
+            <h2 class="font-display text-2xl font-semibold">Live Matches</h2>
+          </div>
+
+          <!-- Live Match 1 -->
+          <div class="stat-card overflow-hidden animate-fade-up delay-1 cursor-pointer transition-all duration-300"
+            onclick="toggleMatchDetail(this)">
+            <div class="bg-gradient-to-r from-sidebar-dark to-[#3d2a1a] p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs text-red-400 font-bold">● LIVE — <span class="live-clock-text">67:32</span></span>
+                <span class="text-xs text-white/50">Group A</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="text-center flex-1">
+                  <div class="text-3xl mb-2">🇧🇷</div>
+                  <p class="text-white font-semibold">Brazil</p>
+                </div>
+                <div class="text-center px-6">
+                  <span class="text-4xl font-headline font-bold text-white">2 — 1</span>
+                </div>
+                <div class="text-center flex-1">
+                  <div class="text-3xl mb-2">🇩🇪</div>
+                  <p class="text-white font-semibold">Germany</p>
+                </div>
+              </div>
+            </div>
+            <div class="px-6 py-3 bg-primary/5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+                <p class="text-xs text-on-surface-variant">AI predicts Brazil 78% likely to win from this position</p>
+              </div>
+              <span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+            </div>
+            <!-- Expandable details -->
+            <div class="match-detail-panel hidden bg-surface border-t border-outline-variant/30 p-6 cursor-default"
+              onclick="event.stopPropagation()">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Match Stats -->
+                <div>
+                  <h4 class="font-display font-semibold mb-4 text-sm">Match Stats</h4>
+                  <div class="space-y-4">
+                    <div class="text-xs font-semibold flex justify-between mb-1">
+                      <span>58%</span><span>Possession</span><span>42%</span>
+                    </div>
+                    <div class="flex h-2 rounded-full overflow-hidden bg-outline-variant/30 mb-3">
+                      <div class="bg-primary h-full" style="width: 58%"></div>
+                      <div class="bg-tertiary h-full" style="width: 42%"></div>
+                    </div>
+
+                    <div class="text-xs font-semibold flex justify-between mb-1"><span>6</span><span>Shots on
+                        Target</span><span>3</span></div>
+                    <div class="flex h-2 rounded-full overflow-hidden bg-outline-variant/30 mb-3">
+                      <div class="bg-primary h-full" style="width: 66%"></div>
+                      <div class="bg-tertiary h-full" style="width: 34%"></div>
+                    </div>
+
+                    <div class="text-xs font-semibold flex justify-between mb-1">
+                      <span>4</span><span>Corners</span><span>2</span>
+                    </div>
+                    <div class="flex h-2 rounded-full overflow-hidden bg-outline-variant/30 mb-3">
+                      <div class="bg-primary h-full" style="width: 66%"></div>
+                      <div class="bg-tertiary h-full" style="width: 34%"></div>
+                    </div>
+
+                    <div class="text-xs font-semibold flex justify-between mb-1">
+                      <span>11</span><span>Fouls</span><span>14</span>
+                    </div>
+                    <div class="flex h-2 rounded-full overflow-hidden bg-outline-variant/30">
+                      <div class="bg-primary h-full" style="width: 44%"></div>
+                      <div class="bg-tertiary h-full" style="width: 56%"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Timeline -->
+                <div>
+                  <h4 class="font-display font-semibold mb-4 text-sm">Timeline</h4>
+                  <div class="relative border-l-2 border-outline-variant/30 pl-4 space-y-4 ml-2">
+                    <div class="relative">
+                      <span
+                        class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-primary ring-4 ring-surface"></span>
+                      <p class="text-xs font-bold">12' — Goal (Brazil)</p>
+                      <p class="text-[10px] text-on-surface-variant">Vinicius Jr. (Assist: Rodrygo)</p>
+                    </div>
+                    <div class="relative">
+                      <span
+                        class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-yellow-400 ring-4 ring-surface"></span>
+                      <p class="text-xs font-bold">28' — Yellow Card (Germany)</p>
+                      <p class="text-[10px] text-on-surface-variant">Antonio Rüdiger</p>
+                    </div>
+                    <div class="relative">
+                      <span
+                        class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-tertiary ring-4 ring-surface"></span>
+                      <p class="text-xs font-bold">41' — Goal (Germany)</p>
+                      <p class="text-[10px] text-on-surface-variant">Jamal Musiala (Assist: Wirtz)</p>
+                    </div>
+                    <div class="relative">
+                      <span
+                        class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-primary ring-4 ring-surface"></span>
+                      <p class="text-xs font-bold">54' — Goal (Brazil)</p>
+                      <p class="text-[10px] text-on-surface-variant">Richarlison (Assist: Casemiro)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Match 2 -->
+          <div class="stat-card overflow-hidden animate-fade-up delay-2 cursor-pointer transition-all duration-300"
+            onclick="toggleMatchDetail(this)">
+            <div class="bg-gradient-to-r from-sidebar-dark to-[#3d2a1a] p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs text-red-400 font-bold">● LIVE — <span class="live-clock-text">34:10</span></span>
+                <span class="text-xs text-white/50">Group C</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="text-center flex-1">
+                  <div class="text-3xl mb-2">🇯🇵</div>
+                  <p class="text-white font-semibold">Japan</p>
+                </div>
+                <div class="text-center px-6">
+                  <span class="text-4xl font-headline font-bold text-white">0 — 0</span>
+                </div>
+                <div class="text-center flex-1">
+                  <div class="text-3xl mb-2">🇲🇽</div>
+                  <p class="text-white font-semibold">Mexico</p>
+                </div>
+              </div>
+            </div>
+            <div class="px-6 py-3 bg-primary/5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+                <p class="text-xs text-on-surface-variant">Japan dominating possession (64%) — expected goal in next 15
+                  min: 72%</p>
+              </div>
+              <span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+            </div>
+            <!-- Expandable details -->
+            <div class="match-detail-panel hidden bg-surface border-t border-outline-variant/30 p-6 cursor-default"
+              onclick="event.stopPropagation()">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Match Stats -->
+                <div>
+                  <h4 class="font-display font-semibold mb-4 text-sm">Match Stats</h4>
+                  <div class="space-y-4">
+                    <div class="text-xs font-semibold flex justify-between mb-1">
+                      <span>64%</span><span>Possession</span><span>36%</span>
+                    </div>
+                    <div class="flex h-2 rounded-full overflow-hidden bg-outline-variant/30 mb-3">
+                      <div class="bg-primary h-full" style="width: 64%"></div>
+                      <div class="bg-tertiary h-full" style="width: 36%"></div>
+                    </div>
+
+                    <div class="text-xs font-semibold flex justify-between mb-1"><span>4</span><span>Shots on
+                        Target</span><span>1</span></div>
+                    <div class="flex h-2 rounded-full overflow-hidden bg-outline-variant/30 mb-3">
+                      <div class="bg-primary h-full" style="width: 80%"></div>
+                      <div class="bg-tertiary h-full" style="width: 20%"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Timeline -->
+                <div>
+                  <h4 class="font-display font-semibold mb-4 text-sm">Timeline</h4>
+                  <div class="relative border-l-2 border-outline-variant/30 pl-4 space-y-4 ml-2">
+                    <div class="relative">
+                      <span
+                        class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-yellow-400 ring-4 ring-surface"></span>
+                      <p class="text-xs font-bold">18' — Yellow Card (Mexico)</p>
+                      <p class="text-[10px] text-on-surface-variant">Edson Álvarez</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Match 3 -->
+          <div class="stat-card overflow-hidden animate-fade-up delay-3 cursor-pointer transition-all duration-300"
+            onclick="toggleMatchDetail(this)">
+            <div class="bg-gradient-to-r from-sidebar-dark to-[#3d2a1a] p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs text-amber-400 font-bold">● HT — 45:00+2</span>
+                <span class="text-xs text-white/50">Group B</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="text-center flex-1">
+                  <div class="text-3xl mb-2">🇺🇸</div>
+                  <p class="text-white font-semibold">USA</p>
+                </div>
+                <div class="text-center px-6">
+                  <span class="text-4xl font-headline font-bold text-white">1 — 1</span>
+                </div>
+                <div class="text-center flex-1">
+                  <div class="text-3xl mb-2">🇳🇱</div>
+                  <p class="text-white font-semibold">Netherlands</p>
+                </div>
+              </div>
+            </div>
+            <div class="px-6 py-3 bg-primary/5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+                <p class="text-xs text-on-surface-variant">Even match — Draw probability remains at 38%</p>
+              </div>
+              <span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+            </div>
+            <!-- Expandable details -->
+            <div class="match-detail-panel hidden bg-surface border-t border-outline-variant/30 p-6 cursor-default"
+              onclick="event.stopPropagation()">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Match Stats -->
+                <div>
+                  <h4 class="font-display font-semibold mb-4 text-sm">Match Stats</h4>
+                  <div class="space-y-4">
+                    <div class="text-xs font-semibold flex justify-between mb-1">
+                      <span>48%</span><span>Possession</span><span>52%</span>
+                    </div>
+                    <div class="flex h-2 rounded-full overflow-hidden bg-outline-variant/30 mb-3">
+                      <div class="bg-primary h-full" style="width: 48%"></div>
+                      <div class="bg-tertiary h-full" style="width: 52%"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Timeline -->
+                <div>
+                  <h4 class="font-display font-semibold mb-4 text-sm">Timeline</h4>
+                  <div class="relative border-l-2 border-outline-variant/30 pl-4 space-y-4 ml-2">
+                    <div class="relative">
+                      <span
+                        class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-primary ring-4 ring-surface"></span>
+                      <p class="text-xs font-bold">22' — Goal (USA)</p>
+                      <p class="text-[10px] text-on-surface-variant">Christian Pulisic</p>
+                    </div>
+                    <div class="relative">
+                      <span
+                        class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-tertiary ring-4 ring-surface"></span>
+                      <p class="text-xs font-bold">38' — Goal (Netherlands)</p>
+                      <p class="text-[10px] text-on-surface-variant">Cody Gakpo</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming -->
+          <h2 class="font-display text-xl font-semibold mt-10 mb-4 animate-fade-up delay-4">Upcoming Today</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-up delay-5">
+            <div class="match-card p-5">
+              <div class="text-xs text-on-surface-variant mb-3">Group D — 18:00 Local</div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><span class="text-xl">🇦🇷</span><span
+                    class="font-semibold text-sm">Argentina</span></div>
+                <span class="text-xs font-bold text-outline">VS</span>
+                <div class="flex items-center gap-2"><span class="font-semibold text-sm">France</span><span
+                    class="text-xl">🇫🇷</span></div>
+              </div>
+            </div>
+            <div class="match-card p-5">
+              <div class="text-xs text-on-surface-variant mb-3">Group D — 21:00 Local</div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2"><span class="text-xl">🇪🇸</span><span
+                    class="font-semibold text-sm">Spain</span></div>
+                <span class="text-xs font-bold text-outline">VS</span>
+                <div class="flex items-center gap-2"><span class="font-semibold text-sm">England</span><span
+                    class="text-xl">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-matches -->
+
+
+      <!-- ===== ACADEMY PAGE ===== -->
+      <div id="page-academy" class="hidden">
+        <div class="max-w-4xl mx-auto space-y-6">
+          <div class="stat-card p-8 animate-fade-up">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-2xl">school</span>
+              </div>
+              <div>
+                <h2 class="font-display text-2xl font-semibold">Football AI Academy</h2>
+                <p class="text-sm text-on-surface-variant">Learn how AI transforms the beautiful game</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4" id="academy-modules">
+              <!-- Module 1 -->
+              <div class="match-card p-5 cursor-pointer transition-all" onclick="toggleAcademyModule('mod1', this)">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">play_circle</span>
+                    <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">Module 1</span>
+                  </div>
+                  <span class="text-xs font-bold status-badge" id="mod1-status"></span>
+                </div>
+                <h3 class="font-semibold mb-1">Introduction to xG</h3>
+                <p class="text-xs text-on-surface-variant">Understand Expected Goals and how AI calculates scoring
+                  probability.</p>
+
+                <div class="hidden mt-4 pt-4 border-t border-outline-variant/30 academy-content cursor-default"
+                  onclick="event.stopPropagation()">
+                  <div class="prose prose-sm prose-invert text-on-surface-variant mb-6">
+                    <p>Expected Goals (xG) is a statistical metric used to evaluate the quality of a scoring
+                      opportunity. It calculates the likelihood that a particular shot will result in a goal based on
+                      historical data.</p>
+                    <p>Our AI model considers multiple factors: distance to goal, angle, type of assist, whether it was
+                      a header or shot, and the positions of defenders and the goalkeeper.</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl">
+                    <p class="text-sm font-semibold mb-3">Quiz: Which factor most significantly increases xG?</p>
+                    <div class="space-y-2">
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod1', false, this)">A) Shooting with the weak foot</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod1', false, this)">B) Shooting from outside the box</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod1', true, this)">C) Receiving a cutback pass inside the 6-yard
+                        box</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Module 2 -->
+              <div class="match-card p-5 cursor-pointer transition-all" onclick="toggleAcademyModule('mod2', this)">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">play_circle</span>
+                    <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">Module 2</span>
+                  </div>
+                  <span class="text-xs font-bold status-badge" id="mod2-status"></span>
+                </div>
+                <h3 class="font-semibold mb-1">Pass Networks Explained</h3>
+                <p class="text-xs text-on-surface-variant">How graph theory reveals team structure and tactical
+                  patterns.</p>
+
+                <div class="hidden mt-4 pt-4 border-t border-outline-variant/30 academy-content cursor-default"
+                  onclick="event.stopPropagation()">
+                  <div class="prose prose-sm prose-invert text-on-surface-variant mb-6">
+                    <p>Passing networks visualize how players interact with each other. Nodes represent players (sized
+                      by possession), and edges represent passes between them (thickness denotes volume).</p>
+                    <p>AI identifies clusters, central players (hubs), and structural weaknesses in a team's build-up
+                      play, allowing coaches to target pressing triggers effectively.</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl">
+                    <p class="text-sm font-semibold mb-3">Quiz: In a pass network, what does a large node typically
+                      indicate?</p>
+                    <div class="space-y-2">
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod2', false, this)">A) The player ran the furthest</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod2', true, this)">B) The player had high involvement/possession</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod2', false, this)">C) The player made the most tackles</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Module 3 -->
+              <div class="match-card p-5 cursor-pointer transition-all" onclick="toggleAcademyModule('mod3', this)">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">play_circle</span>
+                    <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">Module 3</span>
+                  </div>
+                  <span class="text-xs font-bold status-badge" id="mod3-status"></span>
+                </div>
+                <h3 class="font-semibold mb-1">Pressing Metrics & PPDA</h3>
+                <p class="text-xs text-on-surface-variant">Passes Per Defensive Action and pressing intensity.</p>
+
+                <div class="hidden mt-4 pt-4 border-t border-outline-variant/30 academy-content cursor-default"
+                  onclick="event.stopPropagation()">
+                  <div class="prose prose-sm prose-invert text-on-surface-variant mb-6">
+                    <p>PPDA measures pressing intensity by dividing passes allowed by the defending team's defensive
+                      actions in their attacking regions.</p>
+                    <p>A lower PPDA indicates a more intense press. Modern AI systems also evaluate pressing
+                      efficiency—how often a press leads to a high-value turnover.</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl">
+                    <p class="text-sm font-semibold mb-3">Quiz: Does a lower PPDA value mean higher or lower pressing
+                      intensity?</p>
+                    <div class="space-y-2">
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod3', true, this)">A) Higher intensity</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod3', false, this)">B) Lower intensity</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Module 4 -->
+              <div class="match-card p-5 cursor-pointer transition-all" onclick="toggleAcademyModule('mod4', this)">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">play_circle</span>
+                    <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">Module 4</span>
+                  </div>
+                  <span class="text-xs font-bold status-badge" id="mod4-status"></span>
+                </div>
+                <h3 class="font-semibold mb-1">Injury Prediction Models</h3>
+                <p class="text-xs text-on-surface-variant">Machine learning for muscle injury prevention.</p>
+
+                <div class="hidden mt-4 pt-4 border-t border-outline-variant/30 academy-content cursor-default"
+                  onclick="event.stopPropagation()">
+                  <div class="prose prose-sm prose-invert text-on-surface-variant mb-6">
+                    <p>By monitoring GPS data, sleep patterns, and biometric responses, AI models flag players in the
+                      "red zone" for potential muscle strains.</p>
+                    <p>This allows managers to rotate squads optimally during dense tournament schedules like the World
+                      Cup.</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl">
+                    <p class="text-sm font-semibold mb-3">Quiz: Which data source is most commonly used for load
+                      monitoring?</p>
+                    <div class="space-y-2">
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod4', false, this)">A) Player interviews</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod4', true, this)">B) GPS tracking vests</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Module 5 -->
+              <div class="match-card p-5 cursor-pointer transition-all" onclick="toggleAcademyModule('mod5', this)">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">play_circle</span>
+                    <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">Module 5</span>
+                  </div>
+                  <span class="text-xs font-bold status-badge" id="mod5-status"></span>
+                </div>
+                <h3 class="font-semibold mb-1">VAR Technology & Semi-Automated Offside</h3>
+                <p class="text-xs text-on-surface-variant">How sensors and camera arrays assist referees.</p>
+
+                <div class="hidden mt-4 pt-4 border-t border-outline-variant/30 academy-content cursor-default"
+                  onclick="event.stopPropagation()">
+                  <div class="prose prose-sm prose-invert text-on-surface-variant mb-6">
+                    <p>Semi-Automated Offside Technology (SAOT) uses 12 dedicated tracking cameras underneath the
+                      stadium roof to track the ball and up to 29 data points of each individual player.</p>
+                    <p>This system generates a 3D animation within seconds, significantly reducing VAR review times and
+                      increasing accuracy.</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl">
+                    <p class="text-sm font-semibold mb-3">Quiz: How many data points per player does SAOT track?</p>
+                    <div class="space-y-2">
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod5', false, this)">A) 5</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod5', false, this)">B) 10</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod5', true, this)">C) Up to 29</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Module 6 -->
+              <div class="match-card p-5 cursor-pointer transition-all" onclick="toggleAcademyModule('mod6', this)">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">play_circle</span>
+                    <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">Module 6</span>
+                  </div>
+                  <span class="text-xs font-bold status-badge" id="mod6-status"></span>
+                </div>
+                <h3 class="font-semibold mb-1">AI in the Transfer Market</h3>
+                <p class="text-xs text-on-surface-variant">Scouting players globally using machine learning algorithms.
+                </p>
+
+                <div class="hidden mt-4 pt-4 border-t border-outline-variant/30 academy-content cursor-default"
+                  onclick="event.stopPropagation()">
+                  <div class="prose prose-sm prose-invert text-on-surface-variant mb-6">
+                    <p>Clubs use AI to analyze thousands of leagues simultaneously, finding undervalued players whose
+                      statistical profiles match specific tactical requirements.</p>
+                    <p>Models can project a player's adaptation to a new league based on historical transition data.</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl">
+                    <p class="text-sm font-semibold mb-3">Quiz: What is the main benefit of AI in scouting?</p>
+                    <div class="space-y-2">
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod6', true, this)">A) Analyzing a massive volume of players
+                        quickly</button>
+                      <button
+                        class="w-full text-left p-2 text-xs rounded border border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                        onclick="answerQuiz('mod6', false, this)">B) Replacing human scouts entirely</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-academy -->
+
+
+      <!-- ===== VAR PAGE ===== -->
+      <div id="page-var" class="hidden">
+        <div class="max-w-4xl mx-auto space-y-6">
+          <div class="stat-card p-8 animate-fade-up">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-tertiary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-tertiary text-2xl">videocam</span>
+              </div>
+              <div>
+                <h2 class="font-display text-2xl font-semibold">VAR Decision Analyzer</h2>
+                <p class="text-sm text-on-surface-variant">AI-powered review of refereeing decisions</p>
+              </div>
+            </div>
+
+            <!-- Decision Stats Dashboard -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+              <div class="bg-surface-container-low p-4 rounded-xl text-center">
+                <p class="text-2xl font-bold text-primary">260</p>
+                <p class="text-[10px] text-on-surface-variant uppercase mt-1">Total Decisions</p>
+              </div>
+              <div class="bg-surface-container-low p-4 rounded-xl text-center">
+                <p class="text-2xl font-bold text-green-500">91%</p>
+                <p class="text-[10px] text-on-surface-variant uppercase mt-1">Accuracy Rate</p>
+              </div>
+              <div class="bg-surface-container-low p-4 rounded-xl text-center">
+                <p class="text-2xl font-bold text-tertiary">67s</p>
+                <p class="text-[10px] text-on-surface-variant uppercase mt-1">Avg Review</p>
+              </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+              <button
+                class="px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-on-primary transition-colors filter-btn"
+                onclick="filterVAR('all', this)">All</button>
+              <button
+                class="px-4 py-1.5 rounded-full text-xs font-bold bg-surface-container-high text-on-surface transition-colors filter-btn"
+                onclick="filterVAR('penalty', this)">Penalty</button>
+              <button
+                class="px-4 py-1.5 rounded-full text-xs font-bold bg-surface-container-high text-on-surface transition-colors filter-btn"
+                onclick="filterVAR('offside', this)">Offside</button>
+              <button
+                class="px-4 py-1.5 rounded-full text-xs font-bold bg-surface-container-high text-on-surface transition-colors filter-btn"
+                onclick="filterVAR('redcard', this)">Red Card</button>
+            </div>
+
+            <div class="space-y-4" id="var-decisions-list">
+              <!-- VAR Decision 1 -->
+              <div class="match-card p-5 var-card" data-category="penalty">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">🇧🇷</span><span class="text-sm font-semibold">Brazil vs Germany</span>
+                  </div>
+                  <span class="text-xs font-bold text-green-600 bg-green-500/20 px-2.5 py-1 rounded-full">Correct
+                    Decision</span>
+                </div>
+                <p class="text-sm text-on-surface-variant mb-2"><strong>23' — Penalty Decision:</strong> Rüdiger
+                  handball in the box</p>
+                <div class="flex items-center justify-between mt-3">
+                  <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+                    AI: 96.2% Confidence
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var1', 'up', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_up</span> <span id="var1-up">142</span>
+                    </button>
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var1', 'down', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_down</span> <span
+                        id="var1-down">12</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- VAR Decision 2 -->
+              <div class="match-card p-5 var-card" data-category="offside">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">🇺🇸</span><span class="text-sm font-semibold">USA vs Netherlands</span>
+                  </div>
+                  <span
+                    class="text-xs font-bold text-amber-600 bg-amber-500/20 px-2.5 py-1 rounded-full">Borderline</span>
+                </div>
+                <p class="text-sm text-on-surface-variant mb-2"><strong>38' — Offside Check:</strong> Pulisic goal ruled
+                  onside</p>
+                <div class="flex items-center justify-between mt-3">
+                  <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+                    AI: 51.3% Confidence
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var2', 'up', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_up</span> <span id="var2-up">89</span>
+                    </button>
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var2', 'down', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_down</span> <span
+                        id="var2-down">104</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- VAR Decision 3 -->
+              <div class="match-card p-5 var-card" data-category="penalty">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">🇯🇵</span><span class="text-sm font-semibold">Japan vs Mexico</span>
+                  </div>
+                  <span class="text-xs font-bold text-red-600 bg-red-500/20 px-2.5 py-1 rounded-full">Incorrect</span>
+                </div>
+                <p class="text-sm text-on-surface-variant mb-2"><strong>15' — No Foul Given:</strong> Challenge on Kubo
+                  in the box</p>
+                <div class="flex items-center justify-between mt-3">
+                  <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+                    AI: 84.7% Confidence
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var3', 'up', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_up</span> <span id="var3-up">210</span>
+                    </button>
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var3', 'down', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_down</span> <span
+                        id="var3-down">5</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VAR Decision 4 -->
+              <div class="match-card p-5 var-card" data-category="redcard">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="text-sm font-semibold">England vs
+                      Spain</span>
+                  </div>
+                  <span class="text-xs font-bold text-green-600 bg-green-500/20 px-2.5 py-1 rounded-full">Correct
+                    Decision</span>
+                </div>
+                <p class="text-sm text-on-surface-variant mb-2"><strong>62' — Red Card:</strong> Dangerous tackle by
+                  Rodri</p>
+                <div class="flex items-center justify-between mt-3">
+                  <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+                    AI: 92.1% Confidence
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var4', 'up', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_up</span> <span id="var4-up">305</span>
+                    </button>
+                    <button
+                      class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded text-xs hover:bg-surface-container-high transition-colors"
+                      onclick="voteVAR('var4', 'down', this)">
+                      <span class="material-symbols-outlined text-[14px]">thumb_down</span> <span
+                        id="var4-down">41</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-var -->
+
+
+      <!-- ===== SETTINGS PAGE ===== -->
+      <div id="page-settings" class="hidden">
+        <div class="max-w-2xl mx-auto space-y-6">
+          <div class="stat-card p-8 animate-fade-up">
+            <h2 class="font-display text-2xl font-semibold mb-6">Account</h2>
+            <div class="flex items-center gap-4 mb-6 pb-6 border-b border-outline-variant/30">
+              <div id="settings-initials"
+                class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold shrink-0">
+                VS</div>
+              <div>
+                <p id="settings-name" class="font-semibold text-lg text-on-background">Vedant Singh</p>
+                <p id="settings-email" class="text-sm text-on-surface-variant">vedantsingh257@gmail.com</p>
+              </div>
+            </div>
+            <h2 class="font-display text-2xl font-semibold mb-6">Settings</h2>
+            <div class="space-y-6">
+              <div class="flex items-center justify-between py-3 border-b border-outline-variant/30">
+                <div>
+                  <p class="font-semibold text-sm">Dark Mode</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Switch to dark theme</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" id="dark-mode-toggle" onchange="toggleDarkMode()">
+                  <div
+                    class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full">
+                  </div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between py-3 border-b border-outline-variant/30">
+                <div>
+                  <p class="font-semibold text-sm">Email Notifications</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Receive match alerts and prediction updates</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" checked class="sr-only peer" id="email-notifications-toggle"
+                    onchange="saveSettings()">
+                  <div
+                    class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full">
+                  </div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between py-3 border-b border-outline-variant/30">
+                <div>
+                  <p class="font-semibold text-sm">Live Match Push Alerts</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Get notified for goals and key events</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" checked class="sr-only peer" id="push-alerts-toggle" onchange="saveSettings()">
+                  <div
+                    class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full">
+                  </div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between py-3 border-b border-outline-variant/30">
+                <div>
+                  <p class="font-semibold text-sm">AI Insight Language</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Choose the language for AI-generated content</p>
+                </div>
+                <select
+                  class="bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary"
+                  id="language-select" onchange="saveSettings()">
+                  <option>English</option>
+                  <option>Spanish</option>
+                  <option>French</option>
+                  <option>Portuguese</option>
+                  <option>Arabic</option>
+                  <option>Hindi</option>
+                </select>
+              </div>
+              <div class="flex items-center justify-between py-3">
+                <div>
+                  <p class="font-semibold text-sm">Data Sharing</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Help improve AI models with anonymized usage data</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" id="data-sharing-toggle" onchange="saveSettings()">
+                  <div
+                    class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full">
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-outline-variant/30 flex justify-between items-center">
+              <a href="#" onclick="handleSignOut(event)"
+                class="inline-flex items-center gap-2 text-sm text-on-surface-variant font-semibold hover:text-on-background underline-offset-4">
+                <span class="material-symbols-outlined text-lg">logout</span>
+                Sign Out
+              </a>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="stat-card border-red-500/50 bg-red-50/50 dark:bg-red-900/10 p-8 animate-fade-up delay-1">
+            <h3 class="font-display text-xl font-semibold text-red-600 mb-4">Danger Zone</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between py-3 border-b border-red-500/20">
+                <div>
+                  <p class="font-semibold text-sm">Clear All Data</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Clear all local storage and reset app state.</p>
+                </div>
+                <button onclick="clearAllData()"
+                  class="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-sm font-semibold transition-colors">Clear
+                  Data</button>
+              </div>
+              <div class="flex items-center justify-between py-3">
+                <div>
+                  <p class="font-semibold text-sm text-red-600">Delete Account</p>
+                  <p class="text-xs text-on-surface-variant mt-1">Permanently delete your account and all data.</p>
+                </div>
+                <button onclick="deleteAccount()"
+                  class="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg text-sm font-semibold transition-colors">Delete
+                  Account</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-settings -->
+
+  </div><!-- /page-content -->
+  </main>
+
+  </div><!-- /app-layout -->
+
+
+  <!-- ===== AI CHAT WIDGET ===== -->
+  <!-- Chat FAB -->
+  <button
+    class="fixed bottom-6 right-6 w-14 h-14 bg-primary rounded-2xl shadow-lg shadow-primary/30 flex items-center justify-center text-white z-50 hover:scale-105 active:scale-95 transition-transform chat-fab"
+    onclick="toggleChat()" id="chat-fab">
+    <span class="material-symbols-outlined text-2xl" id="chat-fab-icon">chat</span>
+  </button>
+
+  <!-- Chat Window -->
+  <div
+    class="fixed bottom-24 right-6 w-[380px] max-h-[520px] bg-white rounded-3xl shadow-2xl shadow-black/15 z-50 flex flex-col chat-window hidden"
+    id="chat-window">
+    <!-- Chat Header -->
+    <div class="bg-gradient-to-r from-primary to-primary-container rounded-t-3xl px-5 py-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+        <span class="material-symbols-outlined text-white text-lg">auto_awesome</span>
+      </div>
+      <div>
+        <p class="text-white font-semibold text-sm">Futora AI Assistant</p>
+        <p class="text-white/70 text-xs">Ask about matches, stats, predictions</p>
+      </div>
+      <button class="ml-auto text-white/60 hover:text-white transition-colors" onclick="toggleChat()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <!-- Chat Messages -->
+    <div class="flex-1 overflow-y-auto p-5 space-y-4" id="chat-messages">
+      <div class="chat-msg flex gap-3">
+        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+        </div>
+        <div class="bg-surface-container-low rounded-2xl rounded-tl-md px-4 py-3 max-w-[85%]">
+          <p class="text-sm text-on-background" id="chat-greeting">Hi! 👋 I'm your AI football companion. Ask me
+            anything about the
+            World Cup — predictions, player stats, match analysis, or tactical insights!</p>
+        </div>
+      </div>
+    </div>
+    <!-- Chat Input -->
+    <div class="p-4 border-t border-outline-variant/30">
+      <form class="flex items-center gap-2" onsubmit="sendChatMessage(event)">
+        <input type="text" placeholder="Ask about any match or player..."
+          class="flex-1 bg-surface-container-low rounded-xl px-4 py-3 text-sm border-none outline-none focus:ring-2 focus:ring-primary/20"
+          id="chat-input" />
+        <button type="submit"
+          class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white hover:bg-primary-container transition-colors shrink-0">
+          <span class="material-symbols-outlined text-lg">send</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <script>
+    // ===== SESSION GUARD & INITIALIZATION =====
+    let authData = null;
+    try {
+      authData = JSON.parse(sessionStorage.getItem('futora_auth'));
+    } catch (e) { }
+    if (!authData || !authData.loggedIn) {
+      window.location.href = 'index.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (authData && authData.name) {
+        const initials = authData.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('sidebar-initials').textContent = initials;
+        document.getElementById('sidebar-name').textContent = authData.name;
+        document.getElementById('sidebar-email').textContent = authData.email;
+
+        const settingsInitials = document.getElementById('settings-initials');
+        if (settingsInitials) {
+          settingsInitials.textContent = initials;
+          document.getElementById('settings-name').textContent = authData.name;
+          document.getElementById('settings-email').textContent = authData.email;
+        }
+
+        const firstName = authData.name.split(' ')[0];
+        const greeting = document.getElementById('chat-greeting');
+        if (greeting) greeting.innerHTML = `Hi ${firstName}! 👋 I'm your AI football companion. Ask me anything about the World Cup — predictions, player stats, match analysis, or tactical insights!`;
+      }
+
+      if (localStorage.getItem('futora_dark_mode') === 'true') {
+        document.documentElement.classList.add('dark');
+        const dmToggle = document.getElementById('dark-mode-toggle');
+        if (dmToggle) dmToggle.checked = true;
+      }
+
+      loadSettings();
+
+      setInterval(updateLiveClock, 1000);
+      setInterval(rotateAiInsights, 30000);
+      updateAnalytics();
+      loadAcademyProgress();
+      loadVARVotes();
+    });
+
+    function toggleNotifications(e) {
+      if (e) e.stopPropagation();
+      const panel = document.getElementById('notification-panel');
+      if (panel) panel.classList.toggle('hidden');
+    }
+    document.addEventListener('click', (e) => {
+      const panel = document.getElementById('notification-panel');
+      const btn = document.getElementById('notification-btn');
+      if (panel && !panel.classList.contains('hidden') && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('global-search');
+        if (searchInput) searchInput.focus();
+      }
+      if (e.key === 'Escape') {
+        const panel = document.getElementById('notification-panel');
+        if (panel && !panel.classList.contains('hidden')) panel.classList.add('hidden');
+        if (chatOpen) toggleChat();
+      }
+    });
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('futora_dark_mode', isDark);
+    }
+
+    function saveSettings() {
+      const settings = {
+        emailNotifs: document.getElementById('email-notifications-toggle').checked,
+        pushAlerts: document.getElementById('push-alerts-toggle').checked,
+        language: document.getElementById('language-select').value,
+        dataSharing: document.getElementById('data-sharing-toggle').checked
+      };
+      localStorage.setItem('futora_settings', JSON.stringify(settings));
+    }
+
+    function loadSettings() {
+      const settingsStr = localStorage.getItem('futora_settings');
+      if (settingsStr) {
+        const settings = JSON.parse(settingsStr);
+        document.getElementById('email-notifications-toggle').checked = settings.emailNotifs;
+        document.getElementById('push-alerts-toggle').checked = settings.pushAlerts;
+        document.getElementById('language-select').value = settings.language || 'English';
+        document.getElementById('data-sharing-toggle').checked = settings.dataSharing;
+      }
+    }
+
+    function clearAllData() {
+      if (confirm('Are you sure you want to clear all app data? This cannot be undone.')) {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('futora_')) localStorage.removeItem(key);
+        });
+        alert('Data cleared successfully.');
+        location.reload();
+      }
+    }
+    function deleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This is permanent.')) {
+        const users = JSON.parse(localStorage.getItem('futora_users') || '[]');
+        const filtered = users.filter(u => u.email !== (authData && authData.email));
+        localStorage.setItem('futora_users', JSON.stringify(filtered));
+        handleSignOut();
+      }
+    }
+
+    function handleSearch() {
+      // Simple search mock
+      const query = document.getElementById('global-search').value.toLowerCase();
+      const results = document.getElementById('search-results');
+      if (!query) { results.classList.add('hidden'); return; }
+      results.classList.remove('hidden');
+      results.innerHTML = `<div class="p-3 text-sm text-on-surface-variant">Searching for "${query}"...</div>`;
+    }
+
+    let clockSeconds = 67 * 60 + 32;
+    function updateLiveClock() {
+      clockSeconds++;
+      const mins = Math.floor(clockSeconds / 60);
+      const secs = (clockSeconds % 60).toString().padStart(2, '0');
+      const clockEls = document.querySelectorAll('.live-clock-text');
+      clockEls.forEach(el => el.textContent = `${mins}:${secs}`);
+
+      // Random score update logic
+      if (Math.random() < 0.005) {
+        const teamBScore = document.getElementById('team-b-score');
+        if (teamBScore && teamBScore.textContent === '1') {
+          teamBScore.textContent = '2';
+          const eventBox = document.getElementById('live-match-events');
+          if (eventBox) eventBox.innerHTML += ' <span class="text-white/30">|</span> <span>⚽ Gnabry ' + mins + "'</span>";
+        }
+      }
+    }
+
+    const rotatingInsights = [
+      "Brazil's pressing intensity increased 34% since the 50th minute. Expected goals (xG): BRA 2.4 — GER 1.1",
+      "Germany's mid-block is limiting central progression, forcing Brazil wide 72% of the time.",
+      "Vinicius Jr. has completed 6 successful dribbles in the final third, more than any other player."
+    ];
+    let insightIndex = 0;
+    function rotateAiInsights() {
+      const el = document.getElementById('ai-insight-text');
+      if (el) {
+        el.style.opacity = 0;
+        setTimeout(() => {
+          insightIndex = (insightIndex + 1) % rotatingInsights.length;
+          el.innerHTML = `<strong class="text-on-background">AI Insight:</strong> ${rotatingInsights[insightIndex]}`;
+          el.style.opacity = 1;
+        }, 500);
+      }
+    }
+
+    function updateH2H() {
+      const t1Code = document.getElementById('h2h-team1')?.value || 'ARG';
+      const t2Code = document.getElementById('h2h-team2')?.value || 'FRA';
+      
+      const t1 = (typeof MatchDataEngine !== 'undefined' && MatchDataEngine.teamsData && MatchDataEngine.teamsData[t1Code]) 
+        ? MatchDataEngine.teamsData[t1Code] 
+        : { name: t1Code, rating: 85, attack: 85, defense: 85 };
+      const t2 = (typeof MatchDataEngine !== 'undefined' && MatchDataEngine.teamsData && MatchDataEngine.teamsData[t2Code]) 
+        ? MatchDataEngine.teamsData[t2Code] 
+        : { name: t2Code, rating: 85, attack: 85, defense: 85 };
+
+      let wins1 = 0, wins2 = 0, draws = 0;
+      if (t1.h2h && t1.h2h[t2Code]) {
+        wins1 = t1.h2h[t2Code].w;
+        draws = t1.h2h[t2Code].d;
+        wins2 = t1.h2h[t2Code].l;
+      } else if (t2.h2h && t2.h2h[t1Code]) {
+        wins2 = t2.h2h[t1Code].w;
+        draws = t2.h2h[t1Code].d;
+        wins1 = t2.h2h[t1Code].l;
+      } else {
+        const diff = t1.rating - t2.rating;
+        wins1 = Math.max(1, 4 + Math.round(diff * 0.4));
+        wins2 = Math.max(1, 4 - Math.round(diff * 0.4));
+        draws = 3;
+      }
+
+      document.getElementById('h2h-wins1').textContent = wins1;
+      document.getElementById('h2h-wins2').textContent = wins2;
+      document.getElementById('h2h-draws').textContent = draws;
+
+      const calcLast5 = (code1, code2) => {
+        if (typeof MatchDataEngine !== 'undefined' && MatchDataEngine.computePrediction) {
+          const pred = MatchDataEngine.computePrediction(code1, code2);
+          if (pred.p1 > pred.p2 + 10) return ['W', 'W', 'D', 'W', 'L'];
+          if (pred.p2 > pred.p1 + 10) return ['L', 'D', 'L', 'W', 'L'];
+          return ['D', 'W', 'D', 'L', 'W'];
+        }
+        return ['W', 'D', 'L', 'W', 'D'];
+      };
+
+      const last5Results = calcLast5(t1Code, t2Code);
+      const classes = { 'W': 'bg-primary/20 text-primary', 'L': 'bg-tertiary/20 text-tertiary', 'D': 'bg-outline/20 text-outline' };
+      const last5 = document.getElementById('h2h-last5');
+      if (last5) {
+        last5.innerHTML = last5Results.map(s => `<span class="w-8 h-8 rounded ${classes[s]} flex items-center justify-center font-bold text-xs">${s}</span>`).join('');
+      }
+    }
+
+    function updateAnalytics() {
+      const grid = document.getElementById('heatmap-grid');
+      if (grid) {
+        grid.innerHTML = '';
+        for (let i = 0; i < 18; i++) {
+          const op = Math.floor(Math.random() * 80) + 10;
+          grid.innerHTML += `<div class="heat-cell bg-primary" style="opacity: ${op / 100}"></div>`;
+        }
+      }
+    }
+
+    function toggleMatchDetail(el) {
+      const panel = el.querySelector('.match-detail-panel');
+      if (panel) panel.classList.toggle('hidden');
+    }
+
+    function toggleAcademyModule(modId, el) {
+      const content = el.querySelector('.academy-content');
+      if (content) content.classList.toggle('hidden');
+    }
+
+    function loadAcademyProgress() {
+      let progress = {};
+      try {
+        progress = JSON.parse(localStorage.getItem('futora_academy_progress')) || {};
+      } catch (e) { }
+
+      for (let i = 1; i <= 6; i++) {
+        const badge = document.getElementById(`mod${i}-status`);
+        if (badge) {
+          if (progress[`mod${i}`]) {
+            badge.textContent = '✓ Completed';
+            badge.className = 'text-xs font-bold text-green-600 bg-green-500/20 px-2 py-1 rounded-full status-badge';
+          } else {
+            badge.textContent = 'Not Started';
+            badge.className = 'text-xs font-bold text-on-surface-variant bg-surface-container-high px-2 py-1 rounded-full status-badge';
+          }
+        }
+      }
+    }
+
+    function answerQuiz(modId, isCorrect, btnEl) {
+      const parent = btnEl.parentElement;
+      const buttons = parent.querySelectorAll('button');
+      buttons.forEach(b => {
+        b.disabled = true;
+        b.classList.remove('hover:bg-surface-container-high');
+      });
+
+      if (isCorrect) {
+        btnEl.classList.add('bg-green-500/20', 'border-green-500', 'text-green-700', 'dark:text-green-400');
+        let progress = {};
+        try { progress = JSON.parse(localStorage.getItem('futora_academy_progress')) || {}; } catch (e) { }
+        progress[modId] = true;
+        localStorage.setItem('futora_academy_progress', JSON.stringify(progress));
+        loadAcademyProgress();
+      } else {
+        btnEl.classList.add('bg-red-500/20', 'border-red-500', 'text-red-700', 'dark:text-red-400');
+        // Show the correct one
+        buttons.forEach(b => {
+          if (b.getAttribute('onclick').includes('true')) {
+            b.classList.add('bg-green-500/20', 'border-green-500', 'text-green-700', 'dark:text-green-400');
+          }
+        });
+      }
+    }
+
+    function filterVAR(category, btnEl) {
+      // Update buttons
+      const buttons = btnEl.parentElement.querySelectorAll('.filter-btn');
+      buttons.forEach(b => {
+        b.classList.remove('bg-primary', 'text-on-primary');
+        b.classList.add('bg-surface-container-high', 'text-on-surface');
+      });
+      btnEl.classList.remove('bg-surface-container-high', 'text-on-surface');
+      btnEl.classList.add('bg-primary', 'text-on-primary');
+
+      // Filter cards
+      const cards = document.querySelectorAll('.var-card');
+      cards.forEach(card => {
+        if (category === 'all' || card.getAttribute('data-category') === category) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function voteVAR(varId, voteType, btnEl) {
+      const counter = document.getElementById(`${varId}-${voteType}`);
+      if (!counter) return;
+
+      // Prevent double voting logic for simplicity we just increment and disable
+      const parent = btnEl.parentElement;
+      const buttons = parent.querySelectorAll('button');
+      buttons.forEach(b => b.disabled = true);
+
+      let count = parseInt(counter.textContent) || 0;
+      counter.textContent = count + 1;
+
+      btnEl.classList.add('bg-primary/20', 'text-primary');
+
+      // Persist to local storage
+      let votes = {};
+      try { votes = JSON.parse(localStorage.getItem('futora_var_votes')) || {}; } catch (e) { }
+      if (!votes[varId]) votes[varId] = { up: parseInt(document.getElementById(`${varId}-up`).textContent), down: parseInt(document.getElementById(`${varId}-down`).textContent) };
+
+      votes[varId][voteType] += 1;
+      localStorage.setItem('futora_var_votes', JSON.stringify(votes));
+    }
+
+    function loadVARVotes() {
+      let votes = {};
+      try { votes = JSON.parse(localStorage.getItem('futora_var_votes')) || {}; } catch (e) { }
+
+      for (const [varId, data] of Object.entries(votes)) {
+        const upEl = document.getElementById(`${varId}-up`);
+        const downEl = document.getElementById(`${varId}-down`);
+        if (upEl) upEl.textContent = data.up;
+        if (downEl) downEl.textContent = data.down;
+
+        // If voted, disable buttons
+        if (upEl && downEl) {
+          const buttons = upEl.parentElement.parentElement.querySelectorAll('button');
+          buttons.forEach(b => b.disabled = true);
+        }
+      }
+    }
+
+    // ===== PAGE NAVIGATION =====
+    const pages = ['dashboard', 'predictions', 'analytics', 'matches', 'academy', 'var', 'settings'];
+    const pageTitles = {
+      dashboard: ['Intelligence Dashboard', 'FIFA World Cup 2026 — Real-time AI Insights'],
+      predictions: ['AI Predictions', 'Machine learning match outcome forecasts'],
+      analytics: ['Analytics Hub', 'Advanced performance data and tactical analysis'],
+      matches: ['Live Matches', 'Real-time scores and AI commentary'],
+      academy: ['Football Academy', 'Learn how AI transforms the beautiful game'],
+      var: ['VAR Analysis', 'AI-powered refereeing decision review'],
+      settings: ['Settings', 'Manage your preferences and account'],
+    };
+
+    function switchPage(pageId, navEl) {
+      // Hide all pages
+      pages.forEach(p => {
+        const el = document.getElementById('page-' + p);
+        if (el) el.classList.add('hidden');
+      });
+      // Show target page
+      const target = document.getElementById('page-' + pageId);
+      if (target) target.classList.remove('hidden');
+
+      // Update nav
+      document.querySelectorAll('#main-nav .nav-item').forEach(item => {
+        item.classList.remove('active');
+        item.classList.add('text-white/60');
+        item.classList.remove('text-white');
+      });
+      if (navEl) {
+        navEl.classList.add('active');
+        navEl.classList.remove('text-white/60');
+        navEl.classList.add('text-white');
+      }
+
+      // Update title
+      const [title, subtitle] = pageTitles[pageId] || ['Dashboard', ''];
+      document.getElementById('page-title').textContent = title;
+      document.getElementById('page-subtitle').textContent = subtitle;
+
+      // Close mobile sidebar
+      closeMobileSidebar();
+
+      // Re-trigger animations
+      target.querySelectorAll('.animate-fade-up, .animate-fade-in, .animate-slide-left').forEach(el => {
+        el.style.animation = 'none';
+        el.offsetHeight; // trigger reflow
+        el.style.animation = '';
+      });
+    }
+
+    // ===== MOBILE SIDEBAR =====
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.toggle('mobile-open');
+      overlay.classList.toggle('active');
+    }
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('active');
+    }
+
+    // ===== PLAYER TAB SWITCH =====
+    function switchPlayerTab(tab, btn) {
+      // Update active tab
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active', 'text-primary');
+        b.classList.add('text-on-surface-variant');
+      });
+      btn.classList.add('active', 'text-primary');
+      btn.classList.remove('text-on-surface-variant');
+
+      const playerData = {
+        goals: [
+          { name: 'Kylian Mbappé', team: 'France', value: 5, color: 'primary', initial: 'M' },
+          { name: 'Vinícius Jr.', team: 'Brazil', value: 4, color: 'tertiary', initial: 'V' },
+          { name: 'Erling Haaland', team: 'Norway', value: 4, color: '[#2d6a4f]', initial: 'H' },
+          { name: 'Jude Bellingham', team: 'England', value: 3, color: 'blue-600', initial: 'B' },
+          { name: 'Lamine Yamal', team: 'Spain', value: 3, color: 'amber-600', initial: 'Y' },
+        ],
+        assists: [
+          { name: 'Kevin De Bruyne', team: 'Belgium', value: 6, color: 'primary', initial: 'K' },
+          { name: 'Bruno Fernandes', team: 'Portugal', value: 5, color: 'tertiary', initial: 'B' },
+          { name: 'Pedri', team: 'Spain', value: 4, color: '[#2d6a4f]', initial: 'P' },
+          { name: 'Bukayo Saka', team: 'England', value: 4, color: 'blue-600', initial: 'S' },
+          { name: 'Lionel Messi', team: 'Argentina', value: 3, color: 'amber-600', initial: 'M' },
+        ],
+        rating: [
+          { name: 'Rodri', team: 'Spain', value: '9.2', color: 'primary', initial: 'R' },
+          { name: 'Jude Bellingham', team: 'England', value: '8.9', color: 'tertiary', initial: 'B' },
+          { name: 'Kylian Mbappé', team: 'France', value: '8.7', color: '[#2d6a4f]', initial: 'M' },
+          { name: 'Vinícius Jr.', team: 'Brazil', value: '8.6', color: 'blue-600', initial: 'V' },
+          { name: 'Toni Kroos', team: 'Germany', value: '8.5', color: 'amber-600', initial: 'K' },
+        ],
+      };
+
+      const data = playerData[tab];
+      const list = document.getElementById('player-list');
+      list.innerHTML = data.map((p, i) => `
+      <div class="flex items-center gap-3 chat-msg">
+        <span class="text-sm font-bold text-on-surface-variant w-5">${i + 1}</span>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-${p.color}/20 to-${p.color}/5 flex items-center justify-center text-lg font-bold text-${p.color}">${p.initial}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold truncate">${p.name}</p>
+          <p class="text-xs text-on-surface-variant">${p.team}</p>
+        </div>
+        <span class="text-lg font-headline font-bold text-on-background">${p.value}</span>
+      </div>
+    `).join('');
+    }
+
+    // ===== CHAT WIDGET =====
+    let chatOpen = false;
+
+    function toggleChat() {
+      chatOpen = !chatOpen;
+      const chatWindow = document.getElementById('chat-window');
+      const fabIcon = document.getElementById('chat-fab-icon');
+
+      if (chatOpen) {
+        chatWindow.classList.remove('hidden');
+        setTimeout(() => chatWindow.classList.add('visible'), 10);
+        fabIcon.textContent = 'close';
+      } else {
+        chatWindow.classList.remove('visible');
+        chatWindow.classList.add('hidden');
+        fabIcon.textContent = 'chat';
+      }
+    }
+
+    // API key is stored server-side in .env — never exposed to the browser
+    let chatHistory = [];
+    let _backendAvailable = null; // cached after first probe
+
+    const aiResponses = [
+      "Based on my analysis of 847 historical matchups, Argentina has a 62% probability of beating France in their upcoming fixture. Key factor: Messi's performance peaks in knockout-style scenarios.",
+      "Brazil's pressing intensity this match is extraordinary — 34% above their tournament average. Their PPDA (Passes Per Defensive Action) dropped from 12.3 to 8.1 since halftime.",
+      "Mbappé is currently the tournament's most dangerous attacker with 5 goals and an xG (expected goals) of 4.2 — meaning he's actually outperforming the model's predictions.",
+      "Looking at the historical data, host nation advantage contributes approximately +7.3% to win probability. This could significantly boost USA and Mexico's chances in the later rounds.",
+      "Spain's tiki-taka style is producing 892 passes per match on average — the highest in the tournament. However, only 14% are progressive passes, suggesting they may need to be more direct against deep-defending teams.",
+      "The injury risk model flags 3 players in tonight's Argentina squad with elevated fatigue levels. Enzo Fernández has covered 12.4km per match — highest for any midfielder.",
+    ];
+    let responseIndex = 0;
+
+    async function isBackendAvailable() {
+      if (_backendAvailable !== null) return _backendAvailable;
+      try {
+        const res = await fetch('/api/health', { signal: AbortSignal.timeout(2000) });
+        const data = await res.json();
+        _backendAvailable = res.ok && data.geminiConfigured;
+      } catch {
+        _backendAvailable = false;
+      }
+      return _backendAvailable;
+    }
+
+    async function callGeminiAPI(userMessage) {
+      const backendReady = await isBackendAvailable();
+
+      if (!backendReady) {
+        // Fallback: simulated responses when backend is unreachable
+        return new Promise(resolve => {
+          setTimeout(() => {
+            const res = aiResponses[responseIndex % aiResponses.length];
+            responseIndex++;
+            resolve({ text: res, simulated: true });
+          }, 1200);
+        });
+      }
+
+      // Call the secure backend proxy (API key stays on the server)
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          history: chatHistory
+        })
+      });
+
+      if (!response.ok) throw new Error('Backend proxy request failed');
+      const data = await response.json();
+      return { text: data.reply, simulated: false };
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+
+    function formatMarkdown(text) {
+      // Escape HTML first to prevent XSS from AI output
+      let escaped = escapeHTML(text);
+      return escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+    }
+
+    async function sendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const safeMsg = escapeHTML(msg);
+
+      const messagesDiv = document.getElementById('chat-messages');
+
+      // User message
+      messagesDiv.innerHTML += `
+      <div class="chat-msg flex justify-end">
+        <div class="bg-primary text-white rounded-2xl rounded-tr-md px-4 py-3 max-w-[85%]">
+          <p class="text-sm">${safeMsg}</p>
+        </div>
+      </div>
+    `;
+      input.value = '';
+
+      // Update history
+      chatHistory.push({ role: 'user', text: msg });
+
+      // Typing indicator
+      const typingId = 'typing-' + Date.now();
+      messagesDiv.innerHTML += `
+      <div class="chat-msg flex gap-3" id="${typingId}">
+        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+        </div>
+        <div class="bg-surface-container-low rounded-2xl rounded-tl-md px-4 py-3">
+          <div class="flex items-center gap-1">
+            <div class="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+            <div class="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+            <div class="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+          </div>
+        </div>
+      </div>
+    `;
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      try {
+        const result = await callGeminiAPI(msg);
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        chatHistory.push({ role: 'model', text: result.text });
+
+        let formattedText = formatMarkdown(result.text);
+        if (result.simulated) {
+          formattedText = `<div class="mb-2 px-2 py-1 bg-yellow-500/20 text-yellow-700 text-[10px] rounded font-bold">Simulated Response (Start server: npm start)</div>` + formattedText;
+        }
+
+        messagesDiv.innerHTML += `
+          <div class="chat-msg flex gap-3">
+            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+            </div>
+            <div class="bg-surface-container-low rounded-2xl rounded-tl-md px-4 py-3 max-w-[85%]">
+              <div class="text-sm text-on-background">${formattedText}</div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        messagesDiv.innerHTML += `
+          <div class="chat-msg flex gap-3">
+            <div class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-red-500 text-sm">error</span>
+            </div>
+            <div class="bg-red-50 rounded-2xl rounded-tl-md px-4 py-3 max-w-[85%] border border-red-200">
+              <p class="text-sm text-red-700">Error connecting to AI. Please try again later.</p>
+            </div>
+          </div>
+        `;
+      }
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Keyboard shortcut for chat
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && chatOpen) toggleChat();
+    });
+
+    // ===== SIGN OUT =====
+    function handleSignOut(e) {
+      if (e) e.preventDefault();
+      sessionStorage.removeItem('futora_auth');
+      window.location.href = 'index.html';
+    }
+
+    // ===== MATCH DATA ENGINE (Statistical Predictive Model) =====
+    const MatchDataEngine = {
+      teamsData: {
+        'ESP': { name: 'Spain', flag: '🇪🇸', rating: 88, attack: 89, defense: 86, form: 0.85, rank: 3, h2h: { 'GER': { w: 8, d: 6, l: 5 }, 'FRA': { w: 16, d: 7, l: 13 }, 'BRA': { w: 2, d: 2, l: 5 }, 'ARG': { w: 6, d: 2, l: 6 }, 'ENG': { w: 10, d: 4, l: 13 } } },
+        'GER': { name: 'Germany', flag: '🇩🇪', rating: 85, attack: 86, defense: 83, form: 0.78, rank: 16, h2h: { 'ESP': { w: 5, d: 6, l: 8 }, 'FRA': { w: 10, d: 8, l: 15 }, 'BRA': { w: 5, d: 5, l: 13 }, 'ARG': { w: 7, d: 5, l: 10 }, 'ENG': { w: 13, d: 6, l: 14 } } },
+        'BRA': { name: 'Brazil', flag: '🇧🇷', rating: 90, attack: 92, defense: 87, form: 0.88, rank: 5, h2h: { 'URU': { w: 38, d: 20, l: 21 }, 'GER': { w: 13, d: 5, l: 5 }, 'ESP': { w: 5, d: 2, l: 2 }, 'ARG': { w: 43, d: 26, l: 40 }, 'FRA': { w: 7, d: 4, l: 6 } } },
+        'URU': { name: 'Uruguay', flag: '🇺🇾', rating: 83, attack: 84, defense: 82, form: 0.72, rank: 11, h2h: { 'BRA': { w: 21, d: 20, l: 38 }, 'ARG': { w: 59, d: 49, l: 92 } } },
+        'ENG': { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', rating: 87, attack: 88, defense: 85, form: 0.82, rank: 4, h2h: { 'ITA': { w: 9, d: 11, l: 11 }, 'GER': { w: 14, d: 6, l: 13 }, 'FRA': { w: 17, d: 5, l: 10 }, 'ESP': { w: 13, d: 4, l: 10 } } },
+        'ITA': { name: 'Italy', flag: '🇮🇹', rating: 84, attack: 81, defense: 86, form: 0.74, rank: 9, h2h: { 'ENG': { w: 11, d: 11, l: 9 }, 'GER': { w: 15, d: 8, l: 10 } } },
+        'ARG': { name: 'Argentina', flag: '🇦🇷', rating: 91, attack: 93, defense: 89, form: 0.92, rank: 1, h2h: { 'NED': { w: 4, d: 5, l: 4 }, 'BRA': { w: 40, d: 26, l: 43 }, 'FRA': { w: 6, d: 3, l: 3 }, 'GER': { w: 10, d: 5, l: 7 }, 'ESP': { w: 6, d: 2, l: 6 } } },
+        'NED': { name: 'Netherlands', flag: '🇳🇱', rating: 85, attack: 85, defense: 84, form: 0.79, rank: 7, h2h: { 'ARG': { w: 4, d: 5, l: 4 } } },
+        'POR': { name: 'Portugal', flag: '🇵🇹', rating: 86, attack: 88, defense: 84, form: 0.83, rank: 6, h2h: { 'SUI': { w: 10, d: 5, l: 11 } } },
+        'SUI': { name: 'Switzerland', flag: '🇨🇭', rating: 80, attack: 78, defense: 81, form: 0.68, rank: 19, h2h: { 'POR': { w: 11, d: 5, l: 10 } } },
+        'FRA': { name: 'France', flag: '🇫🇷', rating: 90, attack: 92, defense: 88, form: 0.90, rank: 2, h2h: { 'BEL': { w: 27, d: 19, l: 30 }, 'ARG': { w: 3, d: 3, l: 6 }, 'ESP': { w: 13, d: 7, l: 16 }, 'GER': { w: 15, d: 8, l: 10 } } },
+        'BEL': { name: 'Belgium', flag: '🇧🇪', rating: 83, attack: 84, defense: 81, form: 0.71, rank: 10, h2h: { 'FRA': { w: 30, d: 19, l: 27 } } },
+        'USA': { name: 'USA', flag: '🇺🇸', rating: 81, attack: 80, defense: 81, form: 0.75, rank: 13, h2h: { 'JPN': { w: 1, d: 0, l: 2 } } },
+        'JPN': { name: 'Japan', flag: '🇯🇵', rating: 80, attack: 81, defense: 79, form: 0.76, rank: 18, h2h: { 'USA': { w: 2, d: 0, l: 1 } } },
+        'MEX': { name: 'Mexico', flag: '🇲🇽', rating: 80, attack: 79, defense: 79, form: 0.69, rank: 15, h2h: { 'COL': { w: 10, d: 10, l: 9 } } },
+        'COL': { name: 'Colombia', flag: '🇨🇴', rating: 83, attack: 84, defense: 82, form: 0.81, rank: 12, h2h: { 'MEX': { w: 9, d: 10, l: 10 } } }
+      },
+
+      fixtures: [
+        { id: 1, team1: 'ESP', team1Full: 'Spain', flag1: '🇪🇸', team2: 'GER', team2Full: 'Germany', flag2: '🇩🇪', time: 'Tomorrow, 20:00' },
+        { id: 2, team1: 'BRA', team1Full: 'Brazil', flag1: '🇧🇷', team2: 'URU', team2Full: 'Uruguay', flag2: '🇺🇾', time: 'Jul 2, 18:00' },
+        { id: 3, team1: 'ENG', team1Full: 'England', flag1: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', team2: 'ITA', team2Full: 'Italy', flag2: '🇮🇹', time: 'Jul 3, 20:00' },
+        { id: 4, team1: 'ARG', team1Full: 'Argentina', flag1: '🇦🇷', team2: 'NED', team2Full: 'Netherlands', flag2: '🇳🇱', time: 'Jul 4, 16:00' },
+        { id: 5, team1: 'POR', team1Full: 'Portugal', flag1: '🇵🇹', team2: 'SUI', team2Full: 'Switzerland', flag2: '🇨🇭', time: 'Jul 5, 18:00' },
+        { id: 6, team1: 'FRA', team1Full: 'France', flag1: '🇫🇷', team2: 'BEL', team2Full: 'Belgium', flag2: '🇧🇪', time: 'Jul 6, 20:00' },
+        { id: 7, team1: 'USA', team1Full: 'USA', flag1: '🇺🇸', team2: 'JPN', team2Full: 'Japan', flag2: '🇯🇵', time: 'Jul 7, 16:00' },
+        { id: 8, team1: 'MEX', team1Full: 'Mexico', flag1: '🇲🇽', team2: 'COL', team2Full: 'Colombia', flag2: '🇨🇴', time: 'Jul 8, 18:00' }
+      ],
+
+      predictions: [],
+
+      computePrediction: function(team1Code, team2Code) {
+        const t1 = this.teamsData[team1Code] || { name: team1Code, rating: 80, attack: 80, defense: 80, form: 0.7, rank: 20 };
+        const t2 = this.teamsData[team2Code] || { name: team2Code, rating: 80, attack: 80, defense: 80, form: 0.7, rank: 20 };
+
+        const score1 = (t1.rating * 0.45) + (t1.attack * 0.25) + (t1.defense * 0.15) + (t1.form * 100 * 0.15);
+        const score2 = (t2.rating * 0.45) + (t2.attack * 0.25) + (t2.defense * 0.15) + (t2.form * 100 * 0.15);
+        const diff = score1 - score2;
+
+        const xG1 = Math.max(0.4, Number((1.35 + (t1.attack - t2.defense) * 0.075 + (t1.form - 0.7) * 0.5).toFixed(2)));
+        const xG2 = Math.max(0.4, Number((1.35 + (t2.attack - t1.defense) * 0.075 + (t2.form - 0.7) * 0.5).toFixed(2)));
+
+        const winProb1 = 1 / (1 + Math.exp(-diff / 7.5));
+        const baseDrawChance = 0.26 * Math.exp(-Math.pow(diff / 15.0, 2));
+
+        let p1 = Math.round(winProb1 * (1 - baseDrawChance) * 100);
+        let draw = Math.round(baseDrawChance * 100);
+        let p2 = 100 - p1 - draw;
+
+        p1 = Math.max(10, Math.min(85, p1));
+        p2 = Math.max(10, Math.min(85, p2));
+        draw = 100 - p1 - p2;
+
+        const predGoals1 = Math.round(xG1);
+        const predGoals2 = Math.round(xG2);
+        const predictedScore = `${predGoals1} - ${predGoals2}`;
+        const confidence = Math.round(Math.min(95, 62 + Math.abs(diff) * 3.2));
+
+        let insight = '';
+        if (p1 > p2 + 15) {
+          insight = `${t1.name}'s attack (${t1.attack}) & rank #${t1.rank} give them a strong statistical edge over ${t2.name}.`;
+        } else if (p2 > p1 + 15) {
+          insight = `${t2.name}'s defensive metric (${t2.defense}) & form (${Math.round(t2.form*100)}%) favor them against ${t1.name}.`;
+        } else {
+          insight = `Closely matched statistical profile (rating gap: ${diff.toFixed(1)}). Model projects a tight fixture.`;
+        }
+
+        return { p1, draw, p2, xG1, xG2, predictedScore, confidence, insight, score1, score2, diff };
+      },
+
+      init: function() {
+        this.predictions = this.fixtures.map(fixture => {
+          const model = this.computePrediction(fixture.team1, fixture.team2);
+          return { ...fixture, ...model };
+        });
+
+        this.renderDashboardCards();
+        this.renderPredictionGrid();
+      },
+
+      renderDashboardCards: function() {
+        const container = document.getElementById('dashboard-predictions-container');
+        if (!container) return;
+
+        let html = '';
+        this.predictions.slice(0, 3).forEach((match, idx) => {
+          html += `
+            <div class="match-card p-4 animate-fade-up border border-outline-variant/30 rounded-xl" style="animation-delay: ${idx * 0.1}s">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <span class="text-2xl">${match.flag1}</span>
+                  <span class="font-semibold text-sm">${match.team1Full}</span>
+                </div>
+                <div class="text-center">
+                  <span class="text-[11px] text-on-surface-variant bg-surface-container-high px-2.5 py-0.5 rounded-full font-medium">${match.time}</span>
+                  <div class="text-[10px] font-bold text-primary mt-1">xG: ${match.xG1} - ${match.xG2}</div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="font-semibold text-sm">${match.team2Full}</span>
+                  <span class="text-2xl">${match.flag2}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-primary w-10">${match.p1}%</span>
+                <div class="flex-1 flex h-3 rounded-full overflow-hidden">
+                  <div class="bg-primary rounded-l-full transition-all duration-1000" style="width: ${match.p1}%;"></div>
+                  <div class="bg-outline-variant transition-all duration-1000" style="width: ${match.draw}%;"></div>
+                  <div class="bg-tertiary rounded-r-full transition-all duration-1000" style="width: ${match.p2}%;"></div>
+                </div>
+                <span class="text-xs font-bold text-tertiary w-10 text-right">${match.p2}%</span>
+              </div>
+              <div class="flex justify-between items-center text-xs text-on-surface-variant mt-2 px-1">
+                <span>Confidence: <strong class="text-on-background">${match.confidence}%</strong></span>
+                <span>Draw ${match.draw}%</span>
+                <span>Proj: <strong class="text-on-background">${match.predictedScore}</strong></span>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      },
+
+      renderPredictionGrid: function() {
+        const grid = document.getElementById('predictions-page-grid');
+        if (!grid) return;
+
+        let html = '';
+        this.predictions.forEach((match, idx) => {
+          html += `
+            <div class="p-4 border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-colors animate-fade-up" style="animation-delay: ${idx * 0.05}s">
+              <div class="flex justify-between text-sm mb-2 font-semibold">
+                <span>${match.flag1} ${match.team1} vs ${match.flag2} ${match.team2}</span>
+                <span class="text-xs font-normal text-on-surface-variant">${match.time}</span>
+              </div>
+              <div class="flex h-2 rounded-full overflow-hidden bg-surface-container-high mb-1.5">
+                <div class="bg-primary h-full transition-all duration-1000" style="width: ${match.p1}%" title="${match.team1} Win (${match.p1}%)"></div>
+                <div class="bg-outline h-full transition-all duration-1000" style="width: ${match.draw}%" title="Draw (${match.draw}%)"></div>
+                <div class="bg-tertiary h-full transition-all duration-1000" style="width: ${match.p2}%" title="${match.team2} Win (${match.p2}%)"></div>
+              </div>
+              <div class="flex justify-between text-[11px] font-semibold text-on-surface-variant">
+                <span class="text-primary">${match.team1} ${match.p1}%</span>
+                <span>Draw ${match.draw}%</span>
+                <span class="text-tertiary">${match.team2} ${match.p2}%</span>
+              </div>
+              <div class="mt-2 pt-2 border-t border-outline-variant/20 flex justify-between items-center text-[11px] text-on-surface-variant">
+                <span>xG: <strong>${match.xG1} - ${match.xG2}</strong></span>
+                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold">Score: ${match.predictedScore}</span>
+                <span>Model Conf: <strong>${match.confidence}%</strong></span>
+              </div>
+            </div>
+          `;
+        });
+        grid.innerHTML = html;
+      }
+    };
+    
+    // Initialize data engine
+    document.addEventListener('DOMContentLoaded', () => {
+      MatchDataEngine.init();
+    });
+  </script>
+
+</body>
+
+</html>

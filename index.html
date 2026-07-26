@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Futora | Enterprise Intelligence Login</title>
+  <meta name="description" content="Sign in to Futora — the AI-powered football intelligence platform for the 2026 FIFA World Cup." />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Eb+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "secondary-fixed": "#eae2da", "on-primary": "#ffffff", "tertiary": "#8c3c3c",
+            "on-background": "#3a302a", "outline": "#9a9088", "on-tertiary-fixed-variant": "#6e3030",
+            "secondary-container": "#eae2da", "on-primary-fixed": "#401a08", "surface-dim": "#dcd6cc",
+            "primary-container": "#e08850", "on-secondary-fixed-variant": "#504840",
+            "on-error-container": "#7a1a10", "tertiary-container": "#d47070",
+            "surface-container-low": "#f6f0e8", "surface-bright": "#faf5ee",
+            "on-surface-variant": "#605850", "primary-fixed-dim": "#f0a878",
+            "inverse-primary": "#f0a878", "on-error": "#ffffff", "error": "#c0392b",
+            "surface-container-lowest": "#ffffff", "on-secondary-container": "#605850",
+            "on-secondary": "#ffffff", "error-container": "#fce4e0", "tertiary-fixed": "#fce0e0",
+            "secondary": "#78706a", "on-tertiary-container": "#3a2020", "primary-fixed": "#fbe8d8",
+            "surface-container-highest": "#e6e0d6", "secondary-fixed-dim": "#cec6be",
+            "surface-variant": "#ece6dc", "tertiary-fixed-dim": "#e8a0a0",
+            "on-secondary-fixed": "#2a2420", "outline-variant": "#d8d0c8",
+            "on-primary-fixed-variant": "#8a4518", "on-primary-container": "#fbe8d8",
+            "primary": "#c2652a", "on-tertiary-fixed": "#2e1515", "inverse-surface": "#3a302a",
+            "inverse-on-surface": "#faf5ee", "surface-container-high": "#ece6dc",
+            "surface": "#faf5ee", "on-tertiary": "#ffffff", "on-surface": "#3a302a",
+            "background": "#faf5ee", "surface-container": "#f2ece4", "surface-tint": "#c2652a"
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          fontFamily: { headline: ["Eb Garamond"], display: ["Eb Garamond"], body: ["Manrope"], label: ["Manrope"] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    /* Glassmorphism */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 32px 0 rgba(58, 48, 42, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(to bottom right,
+          rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 40%,
+          rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 60%,
+          rgba(255, 255, 255, 0) 100%);
+      transform: rotate(45deg);
+      animation: shimmer 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) rotate(45deg); }
+    }
+
+    .animate-slide-left {
+      animation: slideLeft 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes slideLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .animate-card-entrance {
+      animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .btn-primary-shine {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .btn-primary-shine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: all 0.5s;
+    }
+
+    .btn-primary-shine:hover::before { left: 100%; }
+
+    .custom-focus:focus {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(194, 101, 42, 0.15);
+      border-color: #c2652a !important;
+    }
+
+    .interactive-hover { transition: all 0.3s ease-in-out; }
+    .interactive-hover:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05); }
+    .active-scale:active { transform: scale(0.98); }
+
+    /* Error state for inputs */
+    .input-error { border-color: #c0392b !important; box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.1) !important; }
+    .input-success { border-color: #27ae60 !important; box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1) !important; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+      20%, 40%, 60%, 80% { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+    @keyframes slideDown {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 200px; }
+    }
+    .slide-down { animation: slideDown 0.3s ease forwards; overflow: hidden; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateX(120%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+    .toast.show { transform: translateX(0); }
+    .toast-success { background: #27ae60; color: white; }
+    .toast-error { background: #c0392b; color: white; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+    .modal-content {
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+
+    /* Card flip transition */
+    .card-container {
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* OAuth popup */
+    .oauth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .oauth-overlay.active { opacity: 1; pointer-events: all; }
+
+    /* Phase 2: Enterprise Login Animation */
+    .stagger-text span {
+      display: inline-block;
+      opacity: 0;
+      animation: staggerIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    @keyframes staggerIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .seq-enter {
+      opacity: 0;
+      animation: fieldEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    @keyframes fieldEnter {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .btn-primary-shine:focus, .btn-primary-shine:hover {
+      animation: pulseButton 2s infinite;
+    }
+    @keyframes pulseButton {
+      0% { box-shadow: 0 0 0 0 rgba(194, 101, 42, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(194, 101, 42, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(194, 101, 42, 0); }
+    }
+    /* Floating Particles */
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: floatUp 10s infinite linear;
+      pointer-events: none;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.8; }
+      100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+    }
+    /* Phase 3: Mesh Gradient */
+    .mesh-bg {
+      background: radial-gradient(circle at 0% 0%, #c2652a 0%, transparent 50%),
+                  radial-gradient(circle at 100% 0%, #8c3c3c 0%, transparent 50%),
+                  radial-gradient(circle at 100% 100%, #e08850 0%, transparent 50%),
+                  radial-gradient(circle at 0% 100%, #faf5ee 0%, transparent 50%);
+      background-size: 200% 200%;
+      animation: meshFlow 15s ease infinite;
+      background-color: #faf5ee; /* fallback */
+    }
+    @keyframes meshFlow {
+      0% { background-position: 0% 0%; }
+      25% { background-position: 100% 0%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+    .grain-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.15;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+  </style>
+</head>
+
+<body class="bg-background font-body text-on-background selection:bg-primary/20">
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal-overlay" id="forgot-modal">
+    <div class="modal-content glass-card rounded-[2rem] p-8 md:p-10 max-w-md w-full mx-4">
+      <div class="text-center space-y-2 mb-6">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-primary/10 rounded-full mb-2">
+          <span class="material-symbols-outlined text-primary text-2xl">lock_reset</span>
+        </div>
+        <h3 class="font-display text-2xl font-semibold text-on-background">Reset Password</h3>
+        <p class="text-on-surface-variant text-sm">Enter your email and we'll send you a reset link.</p>
+      </div>
+      <form id="forgot-form" onsubmit="handleForgotPassword(event)">
+        <div class="space-y-1.5 mb-5">
+          <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1" for="forgot-email">Email Address</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+            <input class="w-full pl-12 pr-4 py-3.5 bg-white border border-outline-variant rounded-xl transition-all duration-300 custom-focus" id="forgot-email" placeholder="name@futora.com" type="email" />
+          </div>
+          <p class="text-xs text-error hidden ml-1" id="forgot-email-error"></p>
+        </div>
+        <!-- Success state -->
+        <div class="hidden mb-5 p-4 bg-green-50 rounded-xl border border-green-200 fade-in" id="forgot-success">
+          <div class="flex items-center gap-2 text-green-700">
+            <span class="material-symbols-outlined text-lg">check_circle</span>
+            <p class="text-sm font-semibold">Reset link sent!</p>
+          </div>
+          <p class="text-xs text-green-600 mt-1 ml-7">Check your inbox for a password reset link. It expires in 15 minutes.</p>
+        </div>
+        <button type="submit" id="forgot-submit-btn" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/20 btn-primary-shine active-scale">
+          Send Reset Link
+        </button>
+      </form>
+      <button onclick="closeForgotModal()" class="mt-4 w-full text-center text-sm text-on-surface-variant hover:text-on-background transition-colors">Cancel</button>
+    </div>
+  </div>
+
+
+  <main class="min-h-screen flex flex-col md:flex-row">
+    <!-- Left Side: Hero Brand Section -->
+    <section class="relative w-full md:w-1/2 min-h-[40vh] md:min-h-screen flex flex-col justify-between p-8 md:p-16 text-white overflow-hidden">
+      <div class="absolute inset-0 z-0 mesh-bg overflow-hidden">
+        <div class="grain-overlay"></div>
+        <div id="particles-container"></div>
+      </div>
+      <div class="relative z-10 space-y-12 animate-slide-left">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">sports_soccer</span>
+          <h1 class="font-display text-3xl font-bold tracking-tight">Futora</h1>
+        </div>
+        <div class="max-w-md space-y-6">
+          <h2 class="font-display text-5xl md:text-6xl leading-[1.1] font-medium italic stagger-text">
+            <span style="animation-delay: 0.1s">The</span>
+            <span style="animation-delay: 0.2s">Future</span>
+            <span style="animation-delay: 0.3s">of</span>
+            <span style="animation-delay: 0.4s">Football</span>
+            <span style="animation-delay: 0.5s">Intelligence</span>
+          </h2>
+          <ul class="space-y-4 font-body text-lg opacity-90">
+            <li class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary-fixed">security</span>
+              <span>Secure AI Infrastructure</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary-fixed">monitoring</span>
+              <span>Global Real-time Analytics</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="relative z-10 flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 w-fit px-4 py-2 rounded-xl animate-slide-left" style="animation-delay: 0.2s;">
+        <span class="material-symbols-outlined text-green-400">verified_user</span>
+        <span class="text-xs uppercase tracking-widest font-semibold">Enterprise Grade Security</span>
+      </div>
+    </section>
+
+    <!-- Right Side: Login / Register -->
+    <section class="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 bg-surface-container-lowest relative">
+      <div class="absolute inset-0 md:hidden z-0">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-background"></div>
+      </div>
+      <div class="w-full max-w-md animate-card-entrance relative z-10">
+        <div class="card-container" id="card-container">
+
+          <!-- ===== LOGIN FORM ===== -->
+          <div id="login-card">
+            <div class="glass-card rounded-[2rem] p-8 md:p-10 space-y-8">
+              <div class="text-center space-y-2">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-2">
+                  <span class="material-symbols-outlined text-primary text-2xl">lock_open</span>
+                </div>
+                <h3 class="font-display text-3xl font-semibold text-on-background">Welcome Back</h3>
+                <p class="text-on-surface-variant text-sm">Enter your credentials to access the intelligence suite.</p>
+              </div>
+
+              <!-- Global login error -->
+              <div class="hidden bg-error-container rounded-xl p-3 flex items-center gap-2 fade-in" id="login-error-banner">
+                <span class="material-symbols-outlined text-error text-lg">error</span>
+                <p class="text-sm text-on-error-container font-medium" id="login-error-text"></p>
+              </div>
+
+              <form class="space-y-5" id="login-form" onsubmit="handleSignIn(event)">
+                <!-- Email Field -->
+                <div class="space-y-1.5 seq-enter" style="animation-delay: 0.1s">
+                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1" for="email">Corporate Email</label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" id="email-icon">mail</span>
+                    <input class="w-full pl-12 pr-10 py-3.5 bg-white border border-outline-variant rounded-xl transition-all duration-300 custom-focus" id="email" placeholder="name@futora.com" type="text" oninput="validateEmailLive()" />
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-sm hidden" id="email-status-icon"></span>
+                  </div>
+                  <p class="text-xs text-error hidden ml-1 fade-in" id="email-error"></p>
+                </div>
+                <!-- Password Field -->
+                <div class="space-y-1.5 seq-enter" style="animation-delay: 0.2s">
+                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1" for="password">Password</label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+                    <input class="w-full pl-12 pr-12 py-3.5 bg-white border border-outline-variant rounded-xl transition-all duration-300 custom-focus" id="password" placeholder="••••••••" type="password" oninput="validatePasswordLive()" />
+                    <button aria-label="Toggle password visibility" class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors p-1" onclick="togglePassword('password', 'pass-icon')" type="button">
+                      <span class="material-symbols-outlined" id="pass-icon">visibility</span>
+                    </button>
+                  </div>
+                  <p class="text-xs text-error hidden ml-1 fade-in" id="password-error"></p>
+                </div>
+                <div class="flex items-center justify-between text-sm seq-enter" style="animation-delay: 0.3s">
+                  <label class="flex items-center gap-2 cursor-pointer group">
+                    <input class="w-4 h-4 rounded text-primary border-outline-variant focus:ring-primary/20 transition-all duration-300" type="checkbox" id="remember-me" />
+                    <span class="text-on-surface-variant group-hover:text-on-background transition-colors">Remember Me</span>
+                  </label>
+                  <a class="text-primary font-semibold hover:underline decoration-2 underline-offset-4 transition-all duration-300 cursor-pointer" onclick="openForgotModal()">Forgot Password?</a>
+                </div>
+                <!-- Sign In Button -->
+                <button type="submit" id="signin-btn" class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 btn-primary-shine active-scale disabled:opacity-60 disabled:cursor-not-allowed transition-opacity seq-enter" style="animation-delay: 0.4s">
+                  <span id="signin-text">Sign In</span>
+                  <span id="signin-loader" class="hidden"><svg class="animate-spin inline-block w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg> Signing In...</span>
+                </button>
+              </form>
+              <!-- Divider -->
+              <div class="flex items-center gap-4 text-outline-variant">
+                <div class="h-[1px] w-full bg-outline-variant/60"></div>
+                <span class="text-xs font-bold tracking-widest text-outline shrink-0">OR</span>
+                <div class="h-[1px] w-full bg-outline-variant/60"></div>
+              </div>
+              <!-- Social Logins -->
+              <div class="grid grid-cols-2 gap-4">
+                <button onclick="handleGoogleSignIn()" id="google-signin-btn" class="flex items-center justify-center gap-2 py-3 border border-outline-variant rounded-xl hover:bg-white interactive-hover active-scale group">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                  </svg>
+                  <span class="text-sm font-semibold">Google</span>
+                </button>
+                <button onclick="handleMicrosoftSignIn()" id="microsoft-signin-btn" class="flex items-center justify-center gap-2 py-3 border border-outline-variant rounded-xl hover:bg-white interactive-hover active-scale">
+                  <svg class="w-5 h-5" viewBox="0 0 23 23">
+                    <path d="M0 0h23v23H0z" fill="#f3f3f3"></path>
+                    <path d="M1 1h10v10H1z" fill="#f35325"></path>
+                    <path d="M12 1h10v10H12z" fill="#81bc06"></path>
+                    <path d="M1 12h10v10H1z" fill="#05a6f0"></path>
+                    <path d="M12 12h10v10H12z" fill="#ffba08"></path>
+                  </svg>
+                  <span class="text-sm font-semibold">Microsoft</span>
+                </button>
+              </div>
+              <!-- Guest Mode -->
+              <div class="pt-4 text-center">
+                <button onclick="handleGuestMode()" id="guest-btn" class="w-full flex items-center justify-center gap-2 py-3 bg-secondary-fixed text-on-secondary-fixed font-bold rounded-xl interactive-hover active-scale">
+                  <span class="material-symbols-outlined text-xl">person_search</span>
+                  <span>Continue as Guest</span>
+                </button>
+                <p class="mt-2 text-xs text-on-surface-variant">Explore the platform without creating an account</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== REGISTER FORM ===== -->
+          <div id="register-card" class="hidden">
+            <div class="glass-card rounded-[2rem] p-8 md:p-10 space-y-6">
+              <div class="text-center space-y-2">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-green-500/10 rounded-full mb-2">
+                  <span class="material-symbols-outlined text-green-600 text-2xl">person_add</span>
+                </div>
+                <h3 class="font-display text-3xl font-semibold text-on-background">Create Account</h3>
+                <p class="text-on-surface-variant text-sm">Join the intelligence revolution. It's free.</p>
+              </div>
+              <form class="space-y-4" id="register-form" onsubmit="handleRegister(event)">
+                <!-- Name Field -->
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1" for="reg-name">Full Name</label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">person</span>
+                    <input class="w-full pl-12 pr-4 py-3 bg-white border border-outline-variant rounded-xl transition-all duration-300 custom-focus" id="reg-name" placeholder="Vedant Singh" type="text" />
+                  </div>
+                  <p class="text-xs text-error hidden ml-1" id="reg-name-error"></p>
+                </div>
+                <!-- Email Field -->
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1" for="reg-email">Email Address</label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+                    <input class="w-full pl-12 pr-4 py-3 bg-white border border-outline-variant rounded-xl transition-all duration-300 custom-focus" id="reg-email" placeholder="name@futora.com" type="text" />
+                  </div>
+                  <p class="text-xs text-error hidden ml-1" id="reg-email-error"></p>
+                </div>
+                <!-- Password Field -->
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1" for="reg-password">Password</label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+                    <input class="w-full pl-12 pr-12 py-3 bg-white border border-outline-variant rounded-xl transition-all duration-300 custom-focus" id="reg-password" placeholder="Min 8 characters" type="password" oninput="updatePasswordStrength()" />
+                    <button aria-label="Toggle password visibility" class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors p-1" onclick="togglePassword('reg-password', 'reg-pass-icon')" type="button">
+                      <span class="material-symbols-outlined" id="reg-pass-icon">visibility</span>
+                    </button>
+                  </div>
+                  <!-- Password strength meter -->
+                  <div class="flex gap-1 mt-1">
+                    <div class="h-1 flex-1 rounded-full bg-outline-variant/40 transition-colors" id="str-1"></div>
+                    <div class="h-1 flex-1 rounded-full bg-outline-variant/40 transition-colors" id="str-2"></div>
+                    <div class="h-1 flex-1 rounded-full bg-outline-variant/40 transition-colors" id="str-3"></div>
+                    <div class="h-1 flex-1 rounded-full bg-outline-variant/40 transition-colors" id="str-4"></div>
+                  </div>
+                  <p class="text-xs text-on-surface-variant ml-1" id="strength-text">Password strength</p>
+                  <p class="text-xs text-error hidden ml-1" id="reg-password-error"></p>
+                </div>
+                <!-- Confirm Password -->
+                <div class="space-y-1.5">
+                  <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1" for="reg-confirm">Confirm Password</label>
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+                    <input class="w-full pl-12 pr-4 py-3 bg-white border border-outline-variant rounded-xl transition-all duration-300 custom-focus" id="reg-confirm" placeholder="Re-enter password" type="password" />
+                  </div>
+                  <p class="text-xs text-error hidden ml-1" id="reg-confirm-error"></p>
+                </div>
+                <button type="submit" id="register-btn" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-600/20 btn-primary-shine active-scale">
+                  <span id="register-text">Create Account</span>
+                  <span id="register-loader" class="hidden"><svg class="animate-spin inline-block w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg> Creating Account...</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer Navigation -->
+        <div class="mt-10 flex flex-col items-center gap-6">
+          <p class="text-sm text-on-surface-variant" id="toggle-form-text">
+            New here? <a class="text-primary font-bold hover:underline underline-offset-4 decoration-2 transition-all duration-300 cursor-pointer" onclick="toggleFormView()" id="toggle-form-link">Create Account</a>
+          </p>
+          <nav class="flex gap-6">
+            <a class="text-xs uppercase tracking-widest text-outline hover:text-primary transition-all duration-300" href="privacy.html">Privacy Policy</a>
+            <a class="text-xs uppercase tracking-widest text-outline hover:text-primary transition-all duration-300" href="terms.html">Terms of Service</a>
+          </nav>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ===== SEED DEMO CREDENTIALS =====
+    (function initDemoAccount() {
+      if (!localStorage.getItem('futora_users')) {
+        const users = [
+          { name: 'Vedant Singh', email: 'vedantsingh257@gmail.com', password: 'Futora2026!' },
+          { name: 'Demo User', email: 'demo@futora.com', password: 'Demo1234!' }
+        ];
+        localStorage.setItem('futora_users', JSON.stringify(users));
+      }
+    })();
+
+    // ===== UTILITY FUNCTIONS =====
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      const icon = type === 'success' ? 'check_circle' : 'error';
+      toast.innerHTML = `<span class="material-symbols-outlined text-lg">${icon}</span> ${message}`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }, 3500);
+    }
+
+    function showFieldError(inputId, errorId, message) {
+      const input = document.getElementById(inputId);
+      const error = document.getElementById(errorId);
+      input.classList.add('input-error');
+      input.classList.remove('input-success');
+      error.textContent = message;
+      error.classList.remove('hidden');
+    }
+
+    function clearFieldError(inputId, errorId) {
+      const input = document.getElementById(inputId);
+      const error = document.getElementById(errorId);
+      input.classList.remove('input-error');
+      error.classList.add('hidden');
+    }
+
+    function showFieldSuccess(inputId) {
+      const input = document.getElementById(inputId);
+      input.classList.remove('input-error');
+      input.classList.add('input-success');
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // ===== PASSWORD TOGGLE =====
+    function togglePassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    // ===== LIVE VALIDATION =====
+    function validateEmailLive() {
+      const email = document.getElementById('email').value.trim();
+      const statusIcon = document.getElementById('email-status-icon');
+      if (email.length === 0) {
+        clearFieldError('email', 'email-error');
+        statusIcon.classList.add('hidden');
+        return;
+      }
+      if (isValidEmail(email)) {
+        clearFieldError('email', 'email-error');
+        showFieldSuccess('email');
+        statusIcon.textContent = 'check_circle';
+        statusIcon.className = 'material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-sm text-green-600';
+      } else {
+        statusIcon.textContent = 'cancel';
+        statusIcon.className = 'material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-sm text-error';
+      }
+    }
+
+    function validatePasswordLive() {
+      const password = document.getElementById('password').value;
+      if (password.length > 0 && password.length < 8) {
+        showFieldError('password', 'password-error', 'Password must be at least 8 characters');
+      } else {
+        clearFieldError('password', 'password-error');
+        if (password.length >= 8) showFieldSuccess('password');
+      }
+    }
+
+    // ===== SIGN IN =====
+    async function handleSignIn(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const errorBanner = document.getElementById('login-error-banner');
+      const errorText = document.getElementById('login-error-text');
+
+      // Hide previous error
+      errorBanner.classList.add('hidden');
+      clearFieldError('email', 'email-error');
+      clearFieldError('password', 'password-error');
+
+      // Validate
+      let hasError = false;
+      if (!email) {
+        showFieldError('email', 'email-error', 'Email is required');
+        hasError = true;
+      } else if (!isValidEmail(email)) {
+        showFieldError('email', 'email-error', 'Please enter a valid email address');
+        hasError = true;
+      }
+      if (!password) {
+        showFieldError('password', 'password-error', 'Password is required');
+        hasError = true;
+      } else if (password.length < 8) {
+        showFieldError('password', 'password-error', 'Password must be at least 8 characters');
+        hasError = true;
+      }
+      if (hasError) {
+        document.getElementById('login-form').classList.add('shake');
+        setTimeout(() => document.getElementById('login-form').classList.remove('shake'), 500);
+        return;
+      }
+
+      // Show loading
+      const btn = document.getElementById('signin-btn');
+      const text = document.getElementById('signin-text');
+      const loader = document.getElementById('signin-loader');
+      btn.disabled = true;
+      text.classList.add('hidden');
+      loader.classList.remove('hidden');
+
+      // Check credentials via backend
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          sessionStorage.setItem('futora_auth', JSON.stringify({ name: data.user.name, email: data.user.email, token: data.token, loggedIn: true }));
+          if (document.getElementById('remember-me').checked) {
+            localStorage.setItem('futora_remembered_email', email);
+          }
+          showToast('Welcome back, ' + data.user.name + '!');
+          setTimeout(() => window.location.href = 'dashboard.html', 800);
+        } else {
+          btn.disabled = false;
+          text.classList.remove('hidden');
+          loader.classList.add('hidden');
+          errorBanner.classList.remove('hidden');
+          errorBanner.classList.add('fade-in');
+          errorText.textContent = data.error || 'Invalid email or password. Please try again.';
+          document.getElementById('login-form').classList.add('shake');
+          setTimeout(() => document.getElementById('login-form').classList.remove('shake'), 500);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        text.classList.remove('hidden');
+        loader.classList.add('hidden');
+        showToast('Server error. Please try again.', 'error');
+      }
+    }
+
+    // ===== TOGGLE LOGIN / REGISTER =====
+    let isRegisterView = false;
+
+    function toggleFormView() {
+      isRegisterView = !isRegisterView;
+      const loginCard = document.getElementById('login-card');
+      const registerCard = document.getElementById('register-card');
+      const toggleText = document.getElementById('toggle-form-text');
+      const container = document.getElementById('card-container');
+
+      container.style.opacity = '0';
+      container.style.transform = 'scale(0.95) translateY(10px)';
+
+      setTimeout(() => {
+        if (isRegisterView) {
+          loginCard.classList.add('hidden');
+          registerCard.classList.remove('hidden');
+          toggleText.innerHTML = 'Already have an account? <a class="text-primary font-bold hover:underline underline-offset-4 decoration-2 transition-all duration-300 cursor-pointer" onclick="toggleFormView()">Sign In</a>';
+        } else {
+          loginCard.classList.remove('hidden');
+          registerCard.classList.add('hidden');
+          toggleText.innerHTML = 'New here? <a class="text-primary font-bold hover:underline underline-offset-4 decoration-2 transition-all duration-300 cursor-pointer" onclick="toggleFormView()">Create Account</a>';
+        }
+        container.style.opacity = '1';
+        container.style.transform = 'scale(1) translateY(0)';
+      }, 300);
+    }
+
+    // ===== PASSWORD STRENGTH =====
+    function updatePasswordStrength() {
+      const password = document.getElementById('reg-password').value;
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+
+      const colors = ['bg-red-500', 'bg-orange-400', 'bg-amber-400', 'bg-green-500'];
+      const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+      const labelColors = ['text-red-500', 'text-orange-400', 'text-amber-500', 'text-green-600'];
+
+      for (let i = 1; i <= 4; i++) {
+        const bar = document.getElementById('str-' + i);
+        bar.className = 'h-1 flex-1 rounded-full transition-colors';
+        bar.classList.add(i <= score ? colors[score - 1] : 'bg-outline-variant/40');
+      }
+
+      const strengthText = document.getElementById('strength-text');
+      if (password.length === 0) {
+        strengthText.textContent = 'Password strength';
+        strengthText.className = 'text-xs text-on-surface-variant ml-1';
+      } else {
+        strengthText.textContent = labels[score - 1] || 'Too short';
+        strengthText.className = 'text-xs ml-1 font-semibold ' + (labelColors[score - 1] || 'text-red-500');
+      }
+    }
+
+    // ===== REGISTER =====
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+
+      // Clear errors
+      ['reg-name', 'reg-email', 'reg-password', 'reg-confirm'].forEach(id => clearFieldError(id, id + '-error'));
+
+      let hasError = false;
+      if (!name || name.length < 2) {
+        showFieldError('reg-name', 'reg-name-error', 'Please enter your full name');
+        hasError = true;
+      }
+      if (!email) {
+        showFieldError('reg-email', 'reg-email-error', 'Email is required');
+        hasError = true;
+      } else if (!isValidEmail(email)) {
+        showFieldError('reg-email', 'reg-email-error', 'Please enter a valid email address');
+        hasError = true;
+      }
+      if (!password) {
+        showFieldError('reg-password', 'reg-password-error', 'Password is required');
+        hasError = true;
+      } else if (password.length < 8) {
+        showFieldError('reg-password', 'reg-password-error', 'Password must be at least 8 characters');
+        hasError = true;
+      }
+      if (password !== confirm) {
+        showFieldError('reg-confirm', 'reg-confirm-error', 'Passwords do not match');
+        hasError = true;
+      }
+      if (hasError) {
+        document.getElementById('register-form').classList.add('shake');
+        setTimeout(() => document.getElementById('register-form').classList.remove('shake'), 500);
+        return;
+      }
+
+      // Show loading
+      const btn = document.getElementById('register-btn');
+      const text = document.getElementById('register-text');
+      const loader = document.getElementById('register-loader');
+      btn.disabled = true;
+      text.classList.add('hidden');
+      loader.classList.remove('hidden');
+
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          sessionStorage.setItem('futora_auth', JSON.stringify({ name: data.user.name, email: data.user.email, token: data.token, loggedIn: true }));
+          showToast('Account created successfully! Welcome to Futora!');
+          setTimeout(() => window.location.href = 'dashboard.html', 1000);
+        } else {
+          btn.disabled = false;
+          text.classList.remove('hidden');
+          loader.classList.add('hidden');
+          if (data.error === 'Email already registered') {
+            showFieldError('reg-email', 'reg-email-error', 'An account with this email already exists');
+          } else {
+            showToast(data.error || 'Registration failed. Please try again.', 'error');
+          }
+          document.getElementById('register-form').classList.add('shake');
+          setTimeout(() => document.getElementById('register-form').classList.remove('shake'), 500);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        text.classList.remove('hidden');
+        loader.classList.add('hidden');
+        showToast('Server error. Please try again.', 'error');
+      }
+    }
+
+    // ===== FORGOT PASSWORD =====
+    function openForgotModal() {
+      document.getElementById('forgot-modal').classList.add('active');
+      document.getElementById('forgot-success').classList.add('hidden');
+      document.getElementById('forgot-submit-btn').classList.remove('hidden');
+      document.getElementById('forgot-email').value = '';
+      clearFieldError('forgot-email', 'forgot-email-error');
+    }
+
+    function closeForgotModal() {
+      document.getElementById('forgot-modal').classList.remove('active');
+    }
+
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      const email = document.getElementById('forgot-email').value.trim();
+      clearFieldError('forgot-email', 'forgot-email-error');
+
+      if (!email) {
+        showFieldError('forgot-email', 'forgot-email-error', 'Please enter your email address');
+        return;
+      }
+      if (!isValidEmail(email)) {
+        showFieldError('forgot-email', 'forgot-email-error', 'Please enter a valid email address');
+        return;
+      }
+
+      document.getElementById('forgot-submit-btn').innerHTML = '<svg class="animate-spin inline-block w-5 h-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Sending...';
+
+      setTimeout(() => {
+        document.getElementById('forgot-success').classList.remove('hidden');
+        document.getElementById('forgot-submit-btn').classList.add('hidden');
+      }, 1500);
+    }
+
+    // ===== OAUTH INTEGRATION =====
+    let GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+    let MSAL_CLIENT_ID = 'YOUR_MSAL_CLIENT_ID';
+    let configLoaded = false;
+
+    async function loadConfig() {
+      if (configLoaded) return;
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        if (data.GOOGLE_CLIENT_ID) GOOGLE_CLIENT_ID = data.GOOGLE_CLIENT_ID;
+        if (data.MSAL_CLIENT_ID) MSAL_CLIENT_ID = data.MSAL_CLIENT_ID;
+      } catch (e) {
+        console.warn('Could not load config from backend, using defaults');
+      }
+      configLoaded = true;
+    }
+
+    let msalInstance;
+    async function getMsalInstance() {
+      await loadConfig();
+      if (!msalInstance && typeof msal !== 'undefined') {
+        msalInstance = new msal.PublicClientApplication({
+          auth: {
+            clientId: MSAL_CLIENT_ID,
+            authority: 'https://login.microsoftonline.com/common'
+          }
+        });
+      }
+      return msalInstance;
+    }
+
+    let tokenClient;
+    async function handleGoogleSignIn() {
+      await loadConfig();
+      if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+        showToast('Please configure GOOGLE_CLIENT_ID in the .env file.', 'error');
+        return;
+      }
+      if (!tokenClient) {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'email profile openid',
+          callback: async (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+              try {
+                const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                });
+                const data = await res.json();
+                completeOAuthSignIn(data.name, data.email);
+              } catch (e) {
+                showToast('Failed to fetch Google profile', 'error');
+              }
+            }
+          },
+        });
+      }
+      tokenClient.requestAccessToken();
+    }
+
+    async function handleMicrosoftSignIn() {
+      await loadConfig();
+      if (MSAL_CLIENT_ID === 'YOUR_MSAL_CLIENT_ID') {
+        showToast('Please configure MSAL_CLIENT_ID in the .env file.', 'error');
+        return;
+      }
+      const msalInst = await getMsalInstance();
+      if (!msalInst) {
+        showToast('MSAL library not loaded', 'error');
+        return;
+      }
+      try {
+        const loginResponse = await msalInst.loginPopup({ scopes: ["user.read"] });
+        completeOAuthSignIn(loginResponse.account.name, loginResponse.account.username);
+      } catch (err) {
+        console.error(err);
+        showToast('Microsoft sign-in failed', 'error');
+      }
+    }
+
+    function completeOAuthSignIn(name, email) {
+      sessionStorage.setItem('futora_auth', JSON.stringify({ name, email, loggedIn: true, provider: 'oauth' }));
+      showToast('Signed in as ' + name);
+      setTimeout(() => window.location.href = 'dashboard.html', 800);
+    }
+
+    // ===== GUEST MODE =====
+    function handleGuestMode() {
+      sessionStorage.setItem('futora_auth', JSON.stringify({ name: 'Guest', email: 'guest@futora.com', loggedIn: true, guest: true }));
+      window.location.href = 'dashboard.html';
+    }
+
+    // ===== INIT =====
+    // Pre-fill remembered email
+    const remembered = localStorage.getItem('futora_remembered_email');
+    if (remembered) {
+      document.getElementById('email').value = remembered;
+      document.getElementById('remember-me').checked = true;
+    }
+
+    // Close modals on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeForgotModal();
+      }
+    });
+
+    // Close modals on overlay click
+    document.getElementById('forgot-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('forgot-modal')) closeForgotModal();
+    });
+
+    // Parallax effect
+    window.addEventListener('scroll', () => {
+      const scroll = window.pageYOffset;
+      const heroText = document.querySelector('.animate-slide-left');
+      if (window.innerWidth > 768 && heroText) {
+        heroText.style.transform = `translateY(${scroll * 0.15}px)`;
+      }
+    });
+
+    // Generate particles
+    (function createParticles() {
+      const container = document.getElementById('particles-container');
+      if (!container) return;
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 6 + 2; 
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+        p.style.animationDelay = (Math.random() * 10) + 's';
+        container.appendChild(p);
+      }
+    })();
+  </script>
+</body>
+
+</html>
