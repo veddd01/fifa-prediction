@@ -1,49 +1,68 @@
-# ⚽ Futora — FIFA World Cup 2026 AI Companion
+# Futora — FIFA World Cup 2026 AI Companion
 
-Futora is an AI-powered football intelligence platform built for the FIFA World Cup 2026. It combines advanced match analytics, AI-powered predictions, player insights, and a conversational AI assistant into a modern enterprise dashboard.
+A football-focused web application combining a responsive dashboard with match information, player insights, football analysis, and a Gemini-powered conversational assistant.
 
----
+## Overview
 
-# Features
+Futora is a full-stack JavaScript project with a static frontend and a Node.js/Express backend. The backend serves the web application, handles API requests, proxies conversations to the Gemini API without exposing the API key to the browser, and provides local SQLite-backed authentication.
 
-- 🔐 Google & Microsoft OAuth login
-- 🤖 Gemini AI football assistant
-- 📊 Match analytics dashboard
-- 📈 AI match predictions
-- ⚽ Live match tracking
-- 👥 Player performance analytics
-- 🎓 Football Academy
-- 🎥 VAR Analysis
-- 🌙 Light/Dark mode
-- 📱 Fully responsive interface
+## Features
 
----
+- Football intelligence dashboard
+- Gemini-powered conversational football assistant
+- Match and player-focused interface
+- User registration and login
+- Password hashing with bcrypt
+- JWT-based session tokens
+- SQLite persistence
+- API rate limiting for the chat endpoint
+- Responsive frontend with light/dark interface support
+- Terms and privacy pages
 
-# Tech Stack
+## Tech Stack
 
-## Frontend
+**Frontend**
 
 - HTML5
 - Vanilla JavaScript
-- TailwindCSS (CDN)
-- Google Identity Services
-- Microsoft MSAL
+- TailwindCSS via CDN
+- Google Identity Services / Microsoft MSAL integration in the frontend
 
-## Backend
+**Backend**
 
 - Node.js
 - Express
-- Google Gemini API
-- dotenv
+- Gemini API
 - CORS
+- dotenv
+- express-rate-limit
+- bcrypt
+- jsonwebtoken
+- SQLite (`sqlite3`)
 
----
+## Architecture
 
-# Project Structure
-
+```text
+Browser
+   │
+   ├── Static HTML / JavaScript / CSS
+   │
+   ▼
+Node.js + Express
+   │
+   ├── Authentication ──► SQLite
+   │
+   ├── Chat endpoint ────► Gemini API
+   │
+   └── Static file serving
 ```
-Futora/
-│
+
+The Gemini API key is read from the server environment and used only by the backend. The chat route is rate-limited before requests are forwarded to Gemini.
+
+## Repository Structure
+
+```text
+fifa-prediction/
 ├── index.html
 ├── dashboard.html
 ├── privacy.html
@@ -51,199 +70,84 @@ Futora/
 ├── server.js
 ├── package.json
 ├── package-lock.json
-├── .env
+├── DESIGN.md
 ├── .gitignore
 └── README.md
 ```
 
----
+## Installation
 
-# Installation
+### Prerequisites
 
-Clone the repository
+- Node.js with a version that supports the project's dependencies
+- A Gemini API key if you want to use the AI assistant
+- OAuth application credentials if using the configured Google/Microsoft authentication flows
 
-```bash
-git clone <your-repository-url>
-cd Futora
-```
-
-Install dependencies
+### Setup
 
 ```bash
+git clone https://github.com/veddd01/fifa-prediction.git
+cd fifa-prediction
 npm install
 ```
 
----
-
-# Environment Variables
-
-Create a `.env` file in the project root.
+Create a `.env` file in the project root:
 
 ```env
-GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+GEMINI_API_KEY=your_gemini_api_key
+GOOGLE_CLIENT_ID=your_google_client_id
+MSAL_CLIENT_ID=your_microsoft_client_id
+JWT_SECRET=replace_with_a_long_random_secret
 ```
 
-You can generate a Gemini API key from Google AI Studio.
+Never commit `.env` or real credentials to the repository.
 
----
+## Usage
 
-# Running the Application
-
-Start the backend server
+Start the server:
 
 ```bash
 npm start
 ```
 
-or
+The application is served on the port defined by `PORT`, or `3000` by default.
 
-```bash
-node server.js
-```
-
-The application will be available at
-
-```
-http://localhost:3000
-```
-
----
-
-# Authentication
-
-## Google Login
-
-Create an OAuth Client ID in Google Cloud Console.
-
-Replace
-
-```javascript
-GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-```
-
-with your own Client ID.
-
----
-
-## Microsoft Login
-
-Register an application in Azure Portal.
-
-Replace
-
-```javascript
-MSAL_CLIENT_ID = "YOUR_MSAL_CLIENT_ID"
-```
-
-with your Azure Application (Client) ID.
-
----
-
-# Gemini AI
-
-Futora uses a secure backend proxy.
-
-```
-Browser
-      │
-      ▼
-Express Backend
-      │
-      ▼
-Gemini API
-```
-
-The Gemini API key is stored only inside `.env`.
-
-The frontend never receives or exposes the API key.
-
----
-
-# API Endpoints
-
-### Health Check
-
-```
-GET /api/health
-```
-
-Returns
-
-```json
-{
-  "status": "ok",
-  "geminiConfigured": true
-}
-```
-
----
-
-### Chat
-
-```
-POST /api/chat
-```
-
-Request
-
-```json
-{
-  "message": "Who is the favorite to win?",
-  "history": []
-}
-```
-
-Response
-
-```json
-{
-  "reply": "..."
-}
-```
-
----
-
-# Security
-
-- ✅ Gemini API key stored in `.env`
-- ✅ API requests proxied through Express
-- ✅ Frontend never exposes the Gemini API key
-- ✅ `.env` excluded using `.gitignore`
-
----
-
-# Development
-
-Install packages
-
-```bash
-npm install
-```
-
-Start server
+For development, the repository currently uses the same Node.js server command:
 
 ```bash
 npm run dev
 ```
 
----
+### API endpoints
 
-# Deployment
+- `GET /api/health` — backend health/configuration status
+- `POST /api/chat` — send a message to the Gemini-powered assistant
+- `POST /api/register` — create a local user account
+- `POST /api/login` — authenticate a local user
+- `GET /api/config` — return non-secret frontend configuration values
 
-Before deploying, ensure:
+## Security Notes
 
-- Gemini API key is configured
-- Google OAuth Client ID is configured
-- Microsoft Client ID is configured
-- `.env` is **not** committed to Git
-- HTTPS is enabled in production
+- `.env` is excluded through `.gitignore`.
+- The Gemini API key is kept server-side.
+- Chat requests are rate-limited.
+- Passwords are hashed with bcrypt before storage.
+- JWT signing should use a strong `JWT_SECRET` supplied through the environment.
 
----
+The application is a project/demo implementation and should receive additional security hardening before production use, including stricter CORS policy, production secret management, stronger authentication/session controls, and more comprehensive validation and testing.
 
-# License
+## Screenshots / Demo
 
-MIT License
+The repository contains the implemented frontend and a `DESIGN.md` document. No external live-demo URL is assumed here so the documentation stays accurate to the repository.
 
----
+## Future Improvements
 
-Built for the future of football.
+- Add automated backend/API tests
+- Improve production authentication and session management
+- Add stronger input validation and security headers
+- Separate frontend assets and backend code into clearer directories
+- Add deployment documentation and CI checks
+
+## Author
+
+**Vedant** — [GitHub](https://github.com/veddd01)
