@@ -14,6 +14,11 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET must be configured in the environment before starting Futora.');
+}
 
 // ---- Middleware ----
 app.use(cors());
@@ -24,11 +29,11 @@ app.use(express.static(path.join(__dirname)));
 
 // ---- Rate Limiting ----
 const chatLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 10, // Limit each IP to 10 requests per `window` (here, per minute)
+  windowMs: 60 * 1000,
+  max: 10,
   message: { reply: 'Woah there! You are asking too many questions too fast. Please wait a minute and try again.' },
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // ---- Gemini Proxy Endpoint ----
@@ -52,7 +57,6 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     "You're enthusiastic but data-driven. Keep responses concise (2-3 sentences max). " +
     'Use football terminology naturally.';
 
-  // Build the Gemini conversation payload from history + new message
   const contents = (history || []).map((msg) => ({
     role: msg.role === 'user' ? 'user' : 'model',
     parts: [{ text: msg.text }],
@@ -111,7 +115,6 @@ app.get('/api/config', (_req, res) => {
 });
 
 // ---- Database & Auth Setup ----
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_change_in_production';
 const db = new sqlite3.Database(path.join(__dirname, 'users.db'), (err) => {
   if (err) console.error('Failed to open database:', err);
   else {
